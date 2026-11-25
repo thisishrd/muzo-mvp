@@ -1,0 +1,2597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>muzo — Come closer. Find your people.</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ==========================================================================
+       BRAND DESIGN TOKENS — DAYLIGHT (#FFFFFF) & OLED DARK (#000000)
+       ========================================================================== */
+    :root {
+      --bg-outer: #EFEFF2;
+      --bg-canvas: #FFFFFF;
+      --bg-surface: rgba(255, 255, 255, 0.86);
+      --bg-surface-solid: #F8F8FA;
+      --bg-pill: #F4F4F6;
+      --bg-pill-hover: #EAEAEF;
+      --ring-stroke: #ECECEF;
+      --ring-accent: rgba(255, 30, 30, 0.14);
+      --border-subtle: rgba(10, 10, 10, 0.08);
+      --border-strong: rgba(10, 10, 10, 0.16);
+      --text-primary: #0A0A0A;
+      --text-secondary: #6E6E73;
+      --text-muted: #9A9AA0;
+      --logo-dot: #0A0A0A;
+      --brand-red: #FF1E1E;
+      --brand-red-hover: #E01616;
+      --brand-red-soft: rgba(255, 30, 30, 0.10);
+      --node-neutral: #B8B8C0;
+      --shadow-float: 0 18px 42px -12px rgba(10, 10, 10, 0.14), 0 4px 12px -2px rgba(10, 10, 10, 0.05);
+      --shadow-device: 0 30px 80px -20px rgba(10, 10, 10, 0.18), 0 0 0 1px rgba(10, 10, 10, 0.07);
+    }
+
+    html.dark {
+      --bg-outer: #09090B;
+      --bg-canvas: #000000;
+      --bg-surface: rgba(18, 18, 20, 0.86);
+      --bg-surface-solid: #121214;
+      --bg-pill: #161618;
+      --bg-pill-hover: #222226;
+      --ring-stroke: #18181B;
+      --ring-accent: rgba(255, 30, 30, 0.22);
+      --border-subtle: rgba(255, 255, 255, 0.10);
+      --border-strong: rgba(255, 255, 255, 0.18);
+      --text-primary: #FFFFFF;
+      --text-secondary: #8E8E93;
+      --text-muted: #5C5C62;
+      --logo-dot: #FFFFFF;
+      --brand-red: #FF1E1E;
+      --brand-red-hover: #FF3838;
+      --brand-red-soft: rgba(255, 30, 30, 0.16);
+      --node-neutral: #48484E;
+      --shadow-float: 0 22px 48px -12px rgba(0, 0, 0, 0.85), 0 0 0 1px rgba(255, 255, 255, 0.09);
+      --shadow-device: 0 30px 90px -15px rgba(0, 0, 0, 0.95), 0 0 0 1px rgba(255, 255, 255, 0.11);
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--bg-outer);
+      color: var(--text-primary);
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      transition: background-color 0.28s ease, color 0.28s ease;
+    }
+
+    .font-brand {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      letter-spacing: -0.03em;
+    }
+
+    .device-shell {
+      background-color: var(--bg-canvas);
+      box-shadow: var(--shadow-device);
+      transition: background-color 0.28s ease, box-shadow 0.28s ease;
+    }
+
+    .surface-glass {
+      background-color: var(--bg-surface);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--border-subtle);
+      box-shadow: var(--shadow-float);
+      transition: background-color 0.28s ease, border-color 0.28s ease;
+    }
+
+    .pill-surface {
+      background-color: var(--bg-pill);
+      border: 1px solid var(--border-subtle);
+      transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+    }
+
+    .pill-surface:hover {
+      background-color: var(--bg-pill-hover);
+    }
+
+    .pill-surface:active {
+      transform: scale(0.97);
+    }
+
+    /* Radar Concentric Rings & Beacon Pulse */
+    .radar-ring {
+      border: 1px solid var(--ring-stroke);
+      transition: border-color 0.28s ease, transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    @keyframes beaconWave {
+      0% {
+        transform: translate(-50%, -50%) scale(0.75);
+        opacity: 0.55;
+      }
+      100% {
+        transform: translate(-50%, -50%) scale(3.2);
+        opacity: 0;
+      }
+    }
+
+    .beacon-wave {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 56px;
+      height: 56px;
+      border-radius: 9999px;
+      border: 1.5px solid var(--brand-red);
+      pointer-events: none;
+      animation: beaconWave 3.2s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+    }
+
+    .beacon-wave-delayed {
+      animation-delay: 1.6s;
+    }
+
+    @keyframes nodePulse {
+      0%, 100% {
+        transform: scale(1);
+        opacity: 0.45;
+      }
+      50% {
+        transform: scale(1.75);
+        opacity: 0.08;
+      }
+    }
+
+    .node-halo {
+      animation: nodePulse 2.4s ease-in-out infinite;
+    }
+
+    @keyframes floatSlow {
+      0%, 100% { transform: translate(-50%, -50%) translateY(0px); }
+      50% { transform: translate(-50%, -50%) translateY(-3px); }
+    }
+
+    .radar-node-wrapper {
+      position: absolute;
+      transform: translate(-50%, -50%);
+      transition: left 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+                  top 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+                  opacity 0.3s ease,
+                  transform 0.3s ease;
+    }
+
+    /* Slide-Up Drawers */
+    .sheet-backdrop {
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+    .sheet-backdrop.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .bottom-sheet {
+      transform: translateY(102%);
+      transition: transform 0.34s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .bottom-sheet.open {
+      transform: translateY(0%);
+    }
+
+    /* Hide Scrollbars Cleanly */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    /* Filmstrip Snap & Modal Transitions */
+    .filmstrip-snap {
+      scroll-snap-type: x mandatory;
+    }
+    .filmstrip-item {
+      scroll-snap-align: start;
+    }
+    .modal-fade {
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.22s ease, transform 0.22s ease;
+    }
+    .modal-fade.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+  </style>
+</head>
+<body class="flex items-center justify-center min-h-[100dvh] sm:p-4">
+
+  <!-- ========================================================================
+       SINGLE-SCREEN MOBILE APP FRAME
+       ======================================================================== -->
+  <main id="appFrame" class="device-shell relative w-full max-w-md h-[100dvh] sm:h-[844px] sm:max-h-[92dvh] sm:rounded-[38px] flex flex-col overflow-hidden select-none">
+
+    <!-- 1. TOP HEADER BAR -->
+    <header class="relative z-20 flex items-center justify-between px-4 pt-4 pb-2.5 shrink-0">
+      <!-- Brand Lockup: [M•] muzo -->
+      <div class="flex items-center gap-2" aria-label="muzo brand logo">
+        <svg width="30" height="26" viewBox="0 0 120 104" fill="none" xmlns="http://www.w3.org/2000/svg" class="shrink-0">
+          <!-- Floating Upper-Left Circle Dot (#000000 in Daylight, #FFFFFF in OLED Dark) -->
+          <circle cx="20" cy="21" r="14.5" style="fill: var(--logo-dot); transition: fill 0.28s ease;" />
+          <!-- Bold Slanted Geometric M with Thick Rounded Stroke Caps (#FF1E1E) -->
+          <path
+            d="M22 86L49 23L62 63L91 23L91 86"
+            stroke="#FF1E1E"
+            stroke-width="23"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+        <span class="font-brand font-extrabold text-[23px] leading-none tracking-[-0.035em]" style="color: var(--text-primary);">
+          muzo
+        </span>
+      </div>
+
+      <!-- Center Unified Interactive Status & Radius Pill: [ ● LIVE • 100m ] -->
+      <div
+        class="pill-surface flex items-center rounded-full text-[11px] font-semibold tracking-wide overflow-hidden"
+        role="group"
+        aria-label="Live status and proximity radius"
+      >
+        <button
+          id="liveToggleBtn"
+          type="button"
+          class="flex items-center gap-1.5 pl-2.5 pr-2 py-1.5 cursor-pointer hover:opacity-80 transition-opacity"
+          title="Toggle LIVE discovery or GHOST mode"
+        >
+          <span id="liveIndicatorDot" class="w-2 h-2 rounded-full bg-[#FF1E1E] inline-block"></span>
+          <span id="liveStatusLabel">LIVE</span>
+        </button>
+        <span class="opacity-30 select-none">•</span>
+        <button
+          id="radiusCycleBtn"
+          type="button"
+          class="pl-2 pr-2.5 py-1.5 tabular-nums cursor-pointer hover:opacity-80 transition-opacity"
+          title="Cycle proximity radius (20m / 100m / 500m)"
+        >
+          <span id="radiusLabel">100m</span>
+        </button>
+      </div>
+
+      <!-- Right Controls: Day/Dark Toggle + [You] Avatar Button with Capsule Notification Badge -->
+      <div class="flex items-center gap-1.5">
+        <button
+          id="themeToggleBtn"
+          type="button"
+          class="pill-surface w-9 h-9 rounded-full flex items-center justify-center cursor-pointer"
+          aria-label="Toggle Daylight or OLED Dark theme"
+          title="Switch Daylight / OLED Dark"
+        >
+          <svg id="sunIcon" class="w-4 h-4 hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="4"></circle>
+            <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path>
+          </svg>
+          <svg id="moonIcon" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>
+          </svg>
+        </button>
+
+        <button
+          id="profileTriggerBtn"
+          type="button"
+          class="relative pill-surface h-9 px-3 rounded-full flex items-center gap-1.5 text-xs font-semibold cursor-pointer"
+          title="Open Your Vibes & Private Capsule Vault"
+        >
+          <span class="w-2 h-2 rounded-full bg-[#FF1E1E]"></span>
+          <span id="headerUserAlias" class="max-w-[54px] truncate">You</span>
+          <!-- Signal Red Badge Dot when new capsule moments are added -->
+          <span
+            id="youVaultBadgeDot"
+            class="hidden absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-[#FF1E1E] ring-2"
+            style="--tw-ring-color: var(--bg-canvas);"
+            title="New Shared Moment added to your Vault"
+          ></span>
+        </button>
+      </div>
+    </header>
+
+    <!-- 2. CONTEXT / ACTIVE VIBE STRIP -->
+    <section class="relative z-20 px-4 pt-1 pb-2.5 shrink-0">
+      <div class="rounded-2xl px-3.5 py-2.5 border transition-colors" style="background-color: var(--bg-surface-solid); border-color: var(--border-subtle);">
+        <div class="flex items-center justify-between gap-2 mb-2">
+          <p id="userStatusText" class="text-[12.5px] font-medium truncate" style="color: var(--text-primary);">
+            Grabbing espresso &amp; sketching wireframes
+          </p>
+          <button
+            id="editVibeBtn"
+            type="button"
+            class="shrink-0 text-[11px] font-semibold px-2.5 py-1 rounded-full transition-colors cursor-pointer"
+            style="background-color: var(--brand-red-soft); color: #FF1E1E;"
+          >
+            Edit
+          </button>
+        </div>
+
+        <!-- Active 3 Interest Tags -->
+        <div id="activeTagsRow" class="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+          <!-- Populated dynamically via JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. INTERACTIVE PROXIMITY ORBIT (RADAR CANVAS) -->
+    <section id="radarSection" class="relative flex-1 w-full overflow-hidden flex items-center justify-center">
+      <!-- Top Orbit Controls Bar: Match Count + Shared Vibe / All Nearby Filter -->
+      <div class="absolute top-2 left-4 right-4 z-20 flex items-center justify-between pointer-events-none">
+        <div class="pointer-events-auto px-2.5 py-1 rounded-full text-[11px] font-medium flex items-center gap-1.5" style="background-color: var(--bg-pill); color: var(--text-secondary);">
+          <span id="matchCountDot" class="w-1.5 h-1.5 rounded-full bg-[#FF1E1E]"></span>
+          <span id="radarSummaryText">4 vibe matches nearby</span>
+        </div>
+
+        <!-- Compact Pill Filter -->
+        <div class="pointer-events-auto p-0.5 rounded-full flex items-center border" style="background-color: var(--bg-pill); border-color: var(--border-subtle);">
+          <button
+            id="filterSharedBtn"
+            type="button"
+            class="px-2.5 py-1 rounded-full text-[11px] font-semibold transition-all cursor-pointer"
+          >
+            Shared Vibe
+          </button>
+          <button
+            id="filterAllBtn"
+            type="button"
+            class="px-2.5 py-1 rounded-full text-[11px] font-semibold transition-all cursor-pointer"
+          >
+            All Nearby
+          </button>
+        </div>
+      </div>
+
+      <!-- Concentric Radar Geometry Container -->
+      <div id="orbitCanvas" class="relative w-[340px] h-[340px] sm:w-[366px] sm:h-[366px] flex items-center justify-center">
+        <!-- Outer Ring (100% of selected radius) -->
+        <div class="radar-ring absolute inset-0 rounded-full"></div>
+        <!-- 75% Ring -->
+        <div class="radar-ring absolute inset-[12.5%] rounded-full"></div>
+        <!-- 50% Ring -->
+        <div class="radar-ring absolute inset-[25%] rounded-full"></div>
+        <!-- 25% Ring -->
+        <div class="radar-ring absolute inset-[37.5%] rounded-full"></div>
+
+        <!-- Subtle Crosshair Lines -->
+        <div class="absolute inset-x-0 top-1/2 h-[1px] -translate-y-1/2" style="background-color: var(--ring-stroke);"></div>
+        <div class="absolute inset-y-0 left-1/2 w-[1px] -translate-x-1/2" style="background-color: var(--ring-stroke);"></div>
+
+        <!-- Distance Ring Markers -->
+        <span id="outerRingLabel" class="absolute top-2 left-1/2 -translate-x-1/2 text-[10px] font-medium px-1.5 rounded" style="color: var(--text-muted); background-color: var(--bg-canvas);">
+          100m
+        </span>
+        <span id="midRingLabel" class="absolute top-[25%] left-1/2 -translate-x-1/2 -translate-y-1/2 text-[10px] font-medium px-1.5 rounded" style="color: var(--text-muted); background-color: var(--bg-canvas);">
+          50m
+        </span>
+
+        <!-- Animated Radar Waves from Center -->
+        <div id="beaconWave1" class="beacon-wave"></div>
+        <div id="beaconWave2" class="beacon-wave beacon-wave-delayed"></div>
+
+        <!-- Center User [M•] Node -->
+        <button
+          id="centerSelfBtn"
+          type="button"
+          class="relative z-10 w-14 h-14 rounded-full flex items-center justify-center shadow-md border transition-transform active:scale-95 cursor-pointer"
+          style="background-color: var(--bg-canvas); border-color: var(--border-strong);"
+          title="You are at the center of this orbit"
+        >
+          <svg width="26" height="22" viewBox="0 0 120 104" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="20" cy="21" r="14.5" style="fill: var(--logo-dot); transition: fill 0.28s ease;" />
+            <path d="M22 86L49 23L62 63L91 23L91 86" stroke="#FF1E1E" stroke-width="23" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </button>
+
+        <!-- Dynamic Nearby Peer Nodes Layer -->
+        <div id="nodesLayer" class="absolute inset-0 z-10">
+          <!-- Populated dynamically via JS -->
+        </div>
+      </div>
+
+      <!-- Ghost Mode Overlay (shown when user toggles GHOST) -->
+      <div
+        id="ghostOverlay"
+        class="hidden absolute inset-0 z-20 flex flex-col items-center justify-center px-8 text-center backdrop-blur-md transition-opacity"
+        style="background-color: var(--bg-surface);"
+      >
+        <div class="w-12 h-12 rounded-full flex items-center justify-center mb-3 border" style="background-color: var(--bg-pill); border-color: var(--border-subtle);">
+          <span class="w-3 h-3 rounded-full border-2" style="border-color: var(--text-secondary);"></span>
+        </div>
+        <h3 class="font-brand font-bold text-base mb-1" style="color: var(--text-primary);">Ghost Mode Active</h3>
+        <p class="text-xs leading-relaxed mb-4 max-w-[240px]" style="color: var(--text-secondary);">
+          You're invisible to nearby radars and proximity scanning is paused.
+        </p>
+        <button
+          id="resumeLiveBtn"
+          type="button"
+          class="px-4 py-2 rounded-full text-xs font-semibold text-white bg-[#FF1E1E] hover:bg-[#E01616] transition-colors cursor-pointer"
+        >
+          Go Live Again
+        </button>
+      </div>
+
+      <!-- FLOATING GLASSMORPHIC NODE PREVIEW CARD (Lower Orbit) -->
+      <div
+        id="nodePreviewCard"
+        class="surface-glass hidden absolute bottom-3 left-4 right-4 z-30 rounded-[24px] p-4 transition-all duration-200"
+      >
+        <div class="flex items-start justify-between gap-3 mb-2">
+          <div>
+            <div class="flex items-center gap-2">
+              <h3 id="previewName" class="font-brand font-bold text-[16px]" style="color: var(--text-primary);">Tunde</h3>
+              <span id="previewDistance" class="text-[11px] font-semibold px-2 py-0.5 rounded-full tabular-nums" style="background-color: var(--brand-red-soft); color: #FF1E1E;">
+                ~12m away
+              </span>
+            </div>
+            <p id="previewStatus" class="text-xs mt-1 leading-snug" style="color: var(--text-secondary);">
+              Watching Champions League highlights &amp; sketching
+            </p>
+          </div>
+
+          <button
+            id="closePreviewBtn"
+            type="button"
+            class="w-7 h-7 rounded-full flex items-center justify-center text-sm font-medium shrink-0 cursor-pointer"
+            style="background-color: var(--bg-pill); color: var(--text-secondary);"
+            aria-label="Close node preview"
+          >
+            ✕
+          </button>
+        </div>
+
+        <!-- Peer Tags Row -->
+        <div id="previewTags" class="flex flex-wrap items-center gap-1.5 mb-3.5">
+          <!-- Populated dynamically -->
+        </div>
+
+        <!-- Primary Action CTA: Ping / Waiting / Open Chat -->
+        <button
+          id="pingActionBtn"
+          type="button"
+          class="w-full py-2.5 px-4 rounded-2xl text-xs font-bold tracking-wide text-white bg-[#FF1E1E] hover:bg-[#E01616] active:scale-[0.99] transition-all flex items-center justify-center gap-2 cursor-pointer"
+        >
+          <span id="pingBtnText">Ping Tunde</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- 4. COLLAPSED BOTTOM EPHEMERAL CHAT DRAWER PILL -->
+    <footer class="relative z-20 px-4 pb-4 pt-1.5 shrink-0">
+      <button
+        id="openChatDrawerBtn"
+        type="button"
+        class="surface-glass w-full rounded-[22px] px-4 py-3 flex items-center justify-between gap-3 text-left transition-transform active:scale-[0.99] cursor-pointer"
+      >
+        <div class="flex items-center gap-2.5 min-w-0">
+          <span id="activeChatCountBadge" class="shrink-0 w-6 h-6 rounded-full bg-[#FF1E1E] text-white text-[11px] font-bold flex items-center justify-center">
+            1
+          </span>
+          <div class="min-w-0">
+            <p id="drawerPreviewLine" class="text-xs font-semibold truncate" style="color: var(--text-primary);">
+              Tunde (#Football) — Did you see that last-minute goal?!
+            </p>
+            <p id="drawerSubLine" class="text-[10.5px] mt-0.5 truncate" style="color: var(--text-secondary);">
+              Tap to open micro-chat or unlock We Met Capsule
+            </p>
+          </div>
+        </div>
+
+        <div id="drawerStatusPill" class="shrink-0 flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold tabular-nums" style="background-color: var(--bg-pill); color: var(--text-secondary);">
+          <span id="pillTimerIcon">⏳</span>
+          <span id="pillCountdownText">02:00:00</span>
+        </div>
+      </button>
+    </footer>
+
+    <!-- ======================================================================
+         SLIDE-UP SHEET A: EPHEMERAL MICRO-CHAT + 'WE MET' SHARED MOMENT CAPSULE
+         ====================================================================== -->
+    <div id="chatBackdrop" class="sheet-backdrop absolute inset-0 z-40 bg-black/45 backdrop-blur-[2px]"></div>
+
+    <section
+      id="chatSheet"
+      class="bottom-sheet absolute inset-x-0 bottom-0 z-50 h-[88%] rounded-t-[32px] flex flex-col border-t"
+      style="background-color: var(--bg-canvas); border-color: var(--border-subtle);"
+      aria-label="Ephemeral Micro-Chat and Shared Moment Capsule"
+    >
+      <!-- Drag Handle & Top Bar -->
+      <div class="px-4 pt-2.5 pb-2 shrink-0 border-b" style="border-color: var(--border-subtle);">
+        <div class="w-10 h-1 rounded-full mx-auto mb-2.5" style="background-color: var(--border-strong);"></div>
+
+        <div class="flex items-center justify-between gap-2 mb-2.5">
+          <div>
+            <div class="flex items-center gap-2">
+              <h2 class="font-brand font-bold text-base" style="color: var(--text-primary);">Live Hangout</h2>
+              <span id="chatTimerBanner" class="text-[10.5px] font-bold px-2 py-0.5 rounded-full tabular-nums" style="background-color: var(--brand-red-soft); color: #FF1E1E;">
+                02:00:00
+              </span>
+            </div>
+            <p class="text-[11px] mt-0.5" style="color: var(--text-secondary);">
+              Ephemeral thread • Tap <strong style="color: var(--text-primary);">We Met</strong> when you link up
+            </p>
+          </div>
+
+          <button
+            id="closeChatSheetBtn"
+            type="button"
+            class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold cursor-pointer"
+            style="background-color: var(--bg-pill); color: var(--text-secondary);"
+            aria-label="Minimize chat drawer"
+          >
+            ✕
+          </button>
+        </div>
+
+        <!-- Horizontal Thread Switcher Pills -->
+        <div id="threadSwitcherRow" class="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
+
+      <!-- Active Peer Context & Mutual Actions ('Swap Handles' + Signal Red 'We Met') -->
+      <div class="px-4 py-2.5 flex items-center justify-between gap-2 shrink-0 border-b" style="background-color: var(--bg-surface-solid); border-color: var(--border-subtle);">
+        <div class="min-w-0">
+          <div class="flex items-center gap-1.5">
+            <span id="activeChatPeerName" class="font-brand font-bold text-xs" style="color: var(--text-primary);">Tunde</span>
+            <span id="activeChatPeerDist" class="text-[10.5px] font-medium" style="color: var(--text-secondary);">• ~12m</span>
+            <span id="activeChatSharedTag" class="text-[10px] font-semibold px-1.5 py-0.5 rounded" style="background-color: var(--brand-red-soft); color: #FF1E1E;">
+              #Football
+            </span>
+          </div>
+          <p id="handleStatusLine" class="text-[10.5px] truncate mt-0.5" style="color: var(--text-secondary);">
+            Temporary until handles swap or you meet
+          </p>
+        </div>
+
+        <div class="flex items-center gap-1.5 shrink-0">
+          <button
+            id="swapHandlesBtn"
+            type="button"
+            class="px-2.5 py-1.5 rounded-full text-[11px] font-bold transition-all cursor-pointer border"
+            style="background-color: var(--bg-canvas); color: var(--text-primary); border-color: var(--border-strong);"
+          >
+            Swap Handles
+          </button>
+
+          <button
+            id="weMetBtn"
+            type="button"
+            class="px-3 py-1.5 rounded-full text-[11px] font-bold text-white bg-[#FF1E1E] hover:bg-[#E01616] active:scale-95 transition-all flex items-center gap-1 cursor-pointer shadow-xs"
+          >
+            <span id="weMetBtnLabel">We Met</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Unlocked Handles Banner (revealed upon mutual Swap Handles) -->
+      <div
+        id="unlockedHandleBanner"
+        class="hidden mx-4 mt-2.5 px-3.5 py-2 rounded-2xl flex items-center justify-between gap-2 border shrink-0"
+        style="background-color: var(--brand-red-soft); border-color: rgba(255, 30, 30, 0.25);"
+      >
+        <div class="text-[11.5px] truncate">
+          <span class="font-bold text-[#FF1E1E]">Handles Swapped:</span>
+          <span id="unlockedHandleText" class="font-semibold ml-1" style="color: var(--text-primary);">@tunde.ux</span>
+        </div>
+        <button
+          id="copyHandleBtn"
+          type="button"
+          class="shrink-0 text-[10.5px] font-bold px-2.5 py-1 rounded-full bg-[#FF1E1E] text-white cursor-pointer"
+        >
+          Copy
+        </button>
+      </div>
+
+      <!-- Inline Activity Title Setup Card (Appears when user taps 'We Met') -->
+      <div
+        id="weMetSetupCard"
+        class="hidden mx-4 mt-2.5 p-3.5 rounded-2xl border shrink-0"
+        style="background-color: var(--bg-surface-solid); border-color: #FF1E1E;"
+      >
+        <div class="flex items-center justify-between mb-1.5">
+          <span class="font-brand font-bold text-xs flex items-center gap-1.5" style="color: var(--text-primary);">
+            <span class="w-2 h-2 rounded-full bg-[#FF1E1E]"></span>
+            Unlock 24h Shared Moment Capsule
+          </span>
+          <button id="cancelWeMetBtn" type="button" class="text-[11px] font-semibold cursor-pointer" style="color: var(--text-secondary);">
+            Cancel
+          </button>
+        </div>
+        <p class="text-[11px] mb-2.5" style="color: var(--text-secondary);">
+          Name this real-world meetup (2 words) so only you two can drop photos &amp; clips:
+        </p>
+
+        <!-- Preset Two-Word Activity Pills -->
+        <div class="flex flex-wrap gap-1.5 mb-2.5" id="activityPresetRow">
+          <button type="button" data-activity="Suya &amp; Match" class="activity-preset-pill px-2.5 py-1 rounded-full text-[11px] font-semibold border cursor-pointer" style="background-color: var(--bg-pill); border-color: var(--border-subtle); color: var(--text-primary);">
+            Suya &amp; Match
+          </button>
+          <button type="button" data-activity="Airport Coffee" class="activity-preset-pill px-2.5 py-1 rounded-full text-[11px] font-semibold border cursor-pointer" style="background-color: var(--bg-pill); border-color: var(--border-subtle); color: var(--text-primary);">
+            Airport Coffee
+          </button>
+          <button type="button" data-activity="UI Brainstorm" class="activity-preset-pill px-2.5 py-1 rounded-full text-[11px] font-semibold border cursor-pointer" style="background-color: var(--bg-pill); border-color: var(--border-subtle); color: var(--text-primary);">
+            UI Brainstorm
+          </button>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <input
+            id="activityTitleInput"
+            type="text"
+            maxlength="26"
+            placeholder="Or type activity title..."
+            class="flex-1 px-3 py-2 rounded-xl text-xs font-medium outline-none border"
+            style="background-color: var(--bg-canvas); border-color: var(--border-subtle); color: var(--text-primary);"
+          />
+          <button
+            id="confirmWeMetBtn"
+            type="button"
+            class="px-3.5 py-2 rounded-xl text-xs font-bold text-white bg-[#FF1E1E] hover:bg-[#E01616] cursor-pointer shrink-0"
+          >
+            Unlock
+          </button>
+        </div>
+      </div>
+
+      <!-- Segmented Control: 'Chat' vs 'Capsule' (Shown once 'We Met' is unlocked) -->
+      <div id="drawerSegmentWrapper" class="hidden px-4 pt-2.5 pb-1 shrink-0">
+        <div class="p-1 rounded-2xl grid grid-cols-2 gap-1 border" style="background-color: var(--bg-pill); border-color: var(--border-subtle);">
+          <button
+            id="tabChatBtn"
+            type="button"
+            class="py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer"
+          >
+            Chat
+          </button>
+          <button
+            id="tabCapsuleBtn"
+            type="button"
+            class="py-1.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+          >
+            <span>Capsule</span>
+            <span id="capsuleCountPill" class="px-1.5 py-0.2 rounded-full text-[10px] bg-[#FF1E1E] text-white">0</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- VIEW 1: EPHEMERAL MESSAGES VIEW -->
+      <div id="chatTabPanel" class="flex-1 flex flex-col min-h-0">
+        <div id="chatMessagesContainer" class="flex-1 overflow-y-auto px-4 py-3 space-y-2.5 no-scrollbar">
+          <!-- Populated dynamically -->
+        </div>
+
+        <!-- Contextual Quick Icebreakers + Message Composer -->
+        <div class="px-4 pt-2 pb-4 shrink-0 border-t" style="border-color: var(--border-subtle); background-color: var(--bg-canvas);">
+          <div id="icebreakerChipsRow" class="flex items-center gap-1.5 overflow-x-auto no-scrollbar mb-2.5">
+            <!-- Populated dynamically -->
+          </div>
+
+          <form id="chatMessageForm" class="flex items-center gap-2">
+            <input
+              id="chatMessageInput"
+              type="text"
+              placeholder="Say something before the vibe fades..."
+              autocomplete="off"
+              class="flex-1 px-3.5 py-2.5 rounded-2xl text-xs outline-none border transition-colors"
+              style="background-color: var(--bg-pill); border-color: var(--border-subtle); color: var(--text-primary);"
+            />
+            <button
+              type="submit"
+              class="px-4 py-2.5 rounded-2xl text-xs font-bold text-white bg-[#FF1E1E] hover:bg-[#E01616] active:scale-95 transition-all cursor-pointer shrink-0"
+            >
+              Send
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- VIEW 2: SHARED MOMENT CAPSULE VIEW (24h Drop Window + Horizontal Filmstrip) -->
+      <div id="capsuleTabPanel" class="hidden flex-1 flex flex-col min-h-0 overflow-y-auto px-4 py-3 no-scrollbar">
+        <!-- Capsule Header Card -->
+        <div class="rounded-2xl p-3.5 border mb-3 shrink-0" style="background-color: var(--bg-surface-solid); border-color: var(--border-subtle);">
+          <div class="flex items-start justify-between gap-2">
+            <div>
+              <span class="text-[10px] font-bold uppercase tracking-wider text-[#FF1E1E]">
+                Private Co-Owned Capsule
+              </span>
+              <h3 id="capsuleActivityHeading" class="font-brand font-bold text-base mt-0.5" style="color: var(--text-primary);">
+                Suya &amp; Match
+              </h3>
+              <p id="capsuleMetaLine" class="text-[11px] mt-0.5" style="color: var(--text-secondary);">
+                Only visible to you &amp; Tunde • Zero likes or public feeds
+              </p>
+            </div>
+            <span class="shrink-0 px-2.5 py-1 rounded-full text-[10.5px] font-bold" style="background-color: var(--brand-red-soft); color: #FF1E1E;">
+              23h 59m left
+            </span>
+          </div>
+
+          <!-- 24h Drop Window Status Indicator -->
+          <div class="mt-2.5 pt-2.5 border-t flex items-center justify-between text-[11px]" style="border-color: var(--border-subtle); color: var(--text-secondary);">
+            <span class="flex items-center gap-1.5 font-medium">
+              <span class="w-1.5 h-1.5 rounded-full bg-[#FF1E1E] animate-pulse"></span>
+              24h drop window active • Auto-saves to Vault
+            </span>
+          </div>
+        </div>
+
+        <!-- Horizontal Filmstrip of Shared Photos & 15s-30s Video Clips -->
+        <div class="mb-3">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-[11px] font-bold uppercase tracking-wider" style="color: var(--text-secondary);">
+              Shared Filmstrip
+            </span>
+            <span id="filmstripCountLabel" class="text-[11px] font-semibold" style="color: var(--text-muted);">
+              0 moments
+            </span>
+          </div>
+
+          <div
+            id="capsuleFilmstripRow"
+            class="filmstrip-snap flex items-stretch gap-2.5 overflow-x-auto no-scrollbar pb-1 min-h-[196px]"
+          >
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+
+        <!-- '+ Drop Moment' Controls: Real Local File Picker + Simulated Camera / Partner Drop -->
+        <div class="mt-auto pt-2 shrink-0 space-y-2">
+          <!-- Hidden Real File Input supporting photos and videos -->
+          <input
+            id="momentFileInput"
+            type="file"
+            accept="image/*,video/*"
+            multiple
+            class="hidden"
+          />
+
+          <button
+            id="dropMomentPrimaryBtn"
+            type="button"
+            class="w-full py-2.5 px-4 rounded-2xl text-xs font-bold text-white bg-[#FF1E1E] hover:bg-[#E01616] active:scale-[0.99] transition-all flex items-center justify-center gap-2 cursor-pointer"
+          >
+            <span>+ Drop Moment (Photo / Clip)</span>
+          </button>
+
+          <div class="grid grid-cols-2 gap-2">
+            <button
+              id="simCameraSnapBtn"
+              type="button"
+              class="pill-surface py-2 px-3 rounded-xl text-[11px] font-semibold flex items-center justify-center gap-1.5 cursor-pointer"
+              style="color: var(--text-primary);"
+            >
+              <span>📸</span>
+              <span>Instant Cam Snap</span>
+            </button>
+            <button
+              id="simPartnerDropBtn"
+              type="button"
+              class="pill-surface py-2 px-3 rounded-xl text-[11px] font-semibold flex items-center justify-center gap-1.5 cursor-pointer"
+              style="color: var(--text-primary);"
+            >
+              <span>🎬</span>
+              <span id="simPartnerDropLabel">Simulate Partner Clip</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         SLIDE-UP SHEET B: '[YOU]' PROFILE, ACTIVE VIBES & PRIVATE CAPSULE VAULT
+         ====================================================================== -->
+    <div id="vibeBackdrop" class="sheet-backdrop absolute inset-0 z-40 bg-black/45 backdrop-blur-[2px]"></div>
+
+    <section
+      id="vibeSheet"
+      class="bottom-sheet absolute inset-x-0 bottom-0 z-50 h-[88%] rounded-t-[32px] flex flex-col border-t overflow-hidden"
+      style="background-color: var(--bg-canvas); border-color: var(--border-subtle);"
+      aria-label="Your Profile, Active Vibes, and Private Capsule Vault"
+    >
+      <!-- Header + Segmented Navigation ('Active Vibes' vs 'Your Vault') -->
+      <div class="px-4 pt-2.5 pb-3 shrink-0 border-b" style="border-color: var(--border-subtle);">
+        <div class="w-10 h-1 rounded-full mx-auto mb-2.5" style="background-color: var(--border-strong);"></div>
+        <div class="flex items-center justify-between mb-3">
+          <div>
+            <h2 class="font-brand font-bold text-base" style="color: var(--text-primary);">Your Space</h2>
+            <p class="text-[11px]" style="color: var(--text-secondary);">Live radar vibes &amp; private in-person memories</p>
+          </div>
+          <button
+            id="closeVibeSheetBtn"
+            type="button"
+            class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold cursor-pointer"
+            style="background-color: var(--bg-pill); color: var(--text-secondary);"
+          >
+            ✕
+          </button>
+        </div>
+
+        <!-- Top-Level Segmented Switch inside [You] -->
+        <div class="p-1 rounded-2xl grid grid-cols-2 gap-1 border" style="background-color: var(--bg-pill); border-color: var(--border-subtle);">
+          <button
+            id="youTabVibesBtn"
+            type="button"
+            class="py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer"
+          >
+            Active Vibes
+          </button>
+          <button
+            id="youTabVaultBtn"
+            type="button"
+            class="py-1.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+          >
+            <span>Your Vault</span>
+            <span id="vaultTotalBadge" class="px-1.5 py-0.2 rounded-full text-[10px] bg-[#FF1E1E] text-white">2</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- SUB-PANEL 1: ACTIVE VIBES & STATUS EDITOR -->
+      <div id="youVibesPanel" class="flex-1 flex flex-col min-h-0">
+        <div class="flex-1 overflow-y-auto px-4 py-3.5 space-y-4 no-scrollbar">
+          <!-- Alias & Social Handle Row -->
+          <div class="grid grid-cols-2 gap-2.5">
+            <div>
+              <label for="aliasInput" class="block text-[11px] font-semibold mb-1" style="color: var(--text-secondary);">Display Alias</label>
+              <input
+                id="aliasInput"
+                type="text"
+                maxlength="18"
+                class="w-full px-3 py-2 rounded-xl text-xs font-medium outline-none border"
+                style="background-color: var(--bg-pill); border-color: var(--border-subtle); color: var(--text-primary);"
+              />
+            </div>
+            <div>
+              <label for="handleInput" class="block text-[11px] font-semibold mb-1" style="color: var(--text-secondary);">Handle (for Swap)</label>
+              <input
+                id="handleInput"
+                type="text"
+                maxlength="24"
+                class="w-full px-3 py-2 rounded-xl text-xs font-medium outline-none border"
+                style="background-color: var(--bg-pill); border-color: var(--border-subtle); color: var(--text-primary);"
+              />
+            </div>
+          </div>
+
+          <!-- One-Line Status -->
+          <div>
+            <label for="statusInput" class="block text-[11px] font-semibold mb-1" style="color: var(--text-secondary);">One-Line Status</label>
+            <input
+              id="statusInput"
+              type="text"
+              maxlength="64"
+              placeholder="What are you up to right here?"
+              class="w-full px-3 py-2 rounded-xl text-xs font-medium outline-none border"
+              style="background-color: var(--bg-pill); border-color: var(--border-subtle); color: var(--text-primary);"
+            />
+          </div>
+
+          <!-- Curated Tags Selector (Max 3) -->
+          <div>
+            <div class="flex items-center justify-between mb-1.5">
+              <span class="text-[11px] font-semibold" style="color: var(--text-secondary);">Active Interest Tags</span>
+              <span id="tagLimitCounter" class="text-[11px] font-bold text-[#FF1E1E]">3 / 3 selected</span>
+            </div>
+            <div id="curatedTagsGrid" class="flex flex-wrap gap-1.5">
+              <!-- Populated dynamically -->
+            </div>
+          </div>
+
+          <!-- Add Custom #Tag -->
+          <div>
+            <label for="customTagInput" class="block text-[11px] font-semibold mb-1" style="color: var(--text-secondary);">Add Custom Tag</label>
+            <div class="flex items-center gap-2">
+              <input
+                id="customTagInput"
+                type="text"
+                maxlength="18"
+                placeholder="#KanoTech"
+                class="flex-1 px-3 py-2 rounded-xl text-xs font-medium outline-none border"
+                style="background-color: var(--bg-pill); border-color: var(--border-subtle); color: var(--text-primary);"
+              />
+              <button
+                id="addCustomTagBtn"
+                type="button"
+                class="px-3.5 py-2 rounded-xl text-xs font-bold cursor-pointer"
+                style="background-color: var(--bg-pill); color: var(--text-primary); border: 1px solid var(--border-subtle);"
+              >
+                + Add
+              </button>
+            </div>
+          </div>
+
+          <!-- Reset Demo State Option -->
+          <div class="pt-2 border-t flex items-center justify-between" style="border-color: var(--border-subtle);">
+            <span class="text-[11px]" style="color: var(--text-muted);">Restore initial radar &amp; sample Vault</span>
+            <button
+              id="resetDemoBtn"
+              type="button"
+              class="text-[11px] font-semibold underline cursor-pointer"
+              style="color: var(--text-secondary);"
+            >
+              Reset Demo State
+            </button>
+          </div>
+        </div>
+
+        <div class="px-4 py-3 shrink-0 border-t" style="border-color: var(--border-subtle);">
+          <button
+            id="saveVibeBtn"
+            type="button"
+            class="w-full py-2.5 rounded-2xl text-xs font-bold text-white bg-[#FF1E1E] hover:bg-[#E01616] active:scale-[0.99] transition-all cursor-pointer"
+          >
+            Update Radar Vibe
+          </button>
+        </div>
+      </div>
+
+      <!-- SUB-PANEL 2: 'YOUR VAULT' — PRIVATE ARCHIVE OF IN-PERSON MOMENT CAPSULES -->
+      <div id="youVaultPanel" class="hidden flex-1 flex flex-col min-h-0 overflow-y-auto px-4 py-3.5 no-scrollbar">
+        <div class="rounded-2xl px-3.5 py-2.5 border mb-3 flex items-center justify-between" style="background-color: var(--bg-surface-solid); border-color: var(--border-subtle);">
+          <div>
+            <p class="text-xs font-bold" style="color: var(--text-primary);">Private Proof-of-Presence Vault</p>
+            <p class="text-[10.5px] mt-0.5" style="color: var(--text-secondary);">
+              Co-owned only with people you actually met • No public feed
+            </p>
+          </div>
+          <span class="text-base">🔒</span>
+        </div>
+
+        <!-- Vault Capsules List (2 pre-loaded sample meetups + newly unlocked capsules) -->
+        <div id="vaultCapsulesList" class="space-y-2.5 pb-4">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         MODAL 1: VAULT CAPSULE DETAIL STRIP VIEWER
+         ====================================================================== -->
+    <div
+      id="vaultDetailModal"
+      class="modal-fade absolute inset-0 z-50 flex items-end sm:items-center justify-center p-3 bg-black/65 backdrop-blur-sm"
+    >
+      <div
+        class="w-full rounded-[28px] p-4 border shadow-2xl max-h-[85%] flex flex-col"
+        style="background-color: var(--bg-canvas); border-color: var(--border-strong);"
+      >
+        <div class="flex items-start justify-between gap-2 pb-3 border-b" style="border-color: var(--border-subtle);">
+          <div>
+            <div class="flex items-center gap-2">
+              <h3 id="vaultDetailTitle" class="font-brand font-bold text-base" style="color: var(--text-primary);">Suya &amp; Match</h3>
+              <span id="vaultDetailTag" class="text-[10.5px] font-bold px-2 py-0.5 rounded-full" style="background-color: var(--brand-red-soft); color: #FF1E1E;">
+                #Football
+              </span>
+            </div>
+            <p id="vaultDetailMeta" class="text-[11px] mt-1" style="color: var(--text-secondary);">
+              With Tunde • Nov 21, 2026 • Nassarawa, Kano
+            </p>
+          </div>
+          <button
+            id="closeVaultDetailBtn"
+            type="button"
+            class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold cursor-pointer"
+            style="background-color: var(--bg-pill); color: var(--text-secondary);"
+          >
+            ✕
+          </button>
+        </div>
+
+        <!-- Private Photo/Video Strip -->
+        <div
+          id="vaultDetailStrip"
+          class="filmstrip-snap flex items-stretch gap-2.5 overflow-x-auto no-scrollbar py-3.5"
+        >
+          <!-- Populated dynamically -->
+        </div>
+
+        <div class="pt-2 border-t flex items-center justify-between text-[11px]" style="border-color: var(--border-subtle); color: var(--text-secondary);">
+          <span>Shared strictly between you &amp; <strong id="vaultDetailPartner" style="color: var(--text-primary);">Tunde</strong></span>
+          <span>No likes • No public view</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======================================================================
+         MODAL 2: PHOTO / 15s–30s VIDEO CLIP LIGHTBOX PLAYER
+         ====================================================================== -->
+    <div
+      id="mediaLightboxModal"
+      class="modal-fade absolute inset-0 z-50 flex flex-col justify-between p-4 bg-black/92 text-white"
+    >
+      <div class="flex items-center justify-between">
+        <div>
+          <p id="lightboxTitle" class="font-brand font-bold text-sm">Moment Clip • 18s</p>
+          <p id="lightboxSub" class="text-[11px] text-white/70">Dropped by Tunde</p>
+        </div>
+        <button
+          id="closeLightboxBtn"
+          type="button"
+          class="w-9 h-9 rounded-full bg-white/15 hover:bg-white/25 flex items-center justify-center text-sm font-bold cursor-pointer"
+        >
+          ✕
+        </button>
+      </div>
+
+      <!-- Center Media Stage -->
+      <div id="lightboxStage" class="my-auto flex flex-col items-center justify-center w-full max-h-[68%] overflow-hidden rounded-3xl">
+        <!-- Populated dynamically with real <img>/<video> or animated SVG clip player -->
+      </div>
+
+      <div class="text-center text-[11px] text-white/60 pb-2">
+        Private Shared Moment • Stored in your Vault
+      </div>
+    </div>
+
+    <!-- Subtle Floating Toast Feedback (Replaces alert() completely) -->
+    <div
+      id="toastBanner"
+      class="pointer-events-none opacity-0 transition-all duration-200 absolute top-16 left-1/2 -translate-x-1/2 z-50 px-3.5 py-1.5 rounded-full text-[11.5px] font-semibold shadow-lg whitespace-nowrap"
+      style="background-color: var(--text-primary); color: var(--bg-canvas);"
+    >
+      Vibe updated
+    </div>
+  </main>
+
+  <script>
+    /* ==========================================================================
+       MUZO PROTOTYPE STATE, NEARBY PEERS & PRE-LOADED CAPSULE ARTWORK
+       ========================================================================== */
+    const STORAGE_KEY = 'muzo_prototype_state_v2';
+
+    const CURATED_TAGS = [
+      '#Football', '#Startups', '#UIUX',
+      '#Product', '#AI', '#Afrobeats',
+      '#Coffee', '#Travel', '#Design'
+    ];
+
+    const RADIUS_STEPS = [20, 100, 500];
+
+    // 5 interactive nearby user nodes positioned at realistic distances (~12m to ~180m)
+    const NEARBY_PEERS = [
+      {
+        id: 'tunde',
+        name: 'Tunde',
+        handle: '@tunde.ux',
+        distance: 12,
+        angleDeg: 36,
+        tags: ['#Football', '#UIUX', '#Coffee'],
+        status: 'Watching Champions League highlights & sketching'
+      },
+      {
+        id: 'amina',
+        name: 'Amina',
+        handle: '@amina.builds',
+        distance: 28,
+        angleDeg: 214,
+        tags: ['#Startups', '#UIUX', '#AI'],
+        status: 'Testing mobile prototypes over iced espresso'
+      },
+      {
+        id: 'khalid',
+        name: 'Khalid',
+        handle: '@khalid_ng',
+        distance: 54,
+        angleDeg: 134,
+        tags: ['#Startups', '#Product', '#Travel'],
+        status: 'Brainstorming fintech MVP before evening flight'
+      },
+      {
+        id: 'sadiq',
+        name: 'Sadiq',
+        handle: '@sadiq_fc',
+        distance: 92,
+        angleDeg: 312,
+        tags: ['#Football', '#Afrobeats', '#Coffee'],
+        status: 'Debating Premier League top 4 near the terrace'
+      },
+      {
+        id: 'zainab',
+        name: 'Zainab',
+        handle: '@zainab.studio',
+        distance: 165,
+        angleDeg: 172,
+        tags: ['#UIUX', '#Design', '#Afrobeats'],
+        status: 'Reviewing brand systems & curating sunset beats'
+      }
+    ];
+
+    // Clean, atmospheric inline SVG scenes for simulated drops & pre-loaded Vault capsules (zero external URLs)
+    const SCENE_TEMPLATES = {
+      suyaMatch: {
+        title: 'Floodlit Pitch & Suya',
+        gradient: ['#18181B', '#7F1D1D', '#FF1E1E'],
+        accent: '#FFFFFF',
+        icon: '⚽',
+        caption: '90th-minute equalizer celebration'
+      },
+      airportCoffee: {
+        title: 'Gate 2 Espresso',
+        gradient: ['#0A0A0A', '#27272A', '#D97706'],
+        accent: '#FDE68A',
+        icon: '☕',
+        caption: 'Two cortados before boarding call'
+      },
+      uiBrainstorm: {
+        title: 'Whiteboard Sprint',
+        gradient: ['#111827', '#1E293B', '#FF1E1E'],
+        accent: '#F8FAFC',
+        icon: '📐',
+        caption: 'Sketching the radar gesture flow'
+      },
+      terraceSunset: {
+        title: 'Courtyard Golden Hour',
+        gradient: ['#1F1118', '#991B1B', '#F59E0B'],
+        accent: '#FEF3C7',
+        icon: '🌇',
+        caption: 'Evening banter on the terrace'
+      }
+    };
+
+    function getDefaultState() {
+      return {
+        theme: 'light', // 'light' (#FFFFFF) | 'dark' (#000000)
+        isLive: true,
+        radius: 100,
+        filterMode: 'shared', // 'shared' | 'all'
+        user: {
+          alias: 'You',
+          handle: '@you.muzo',
+          status: 'Grabbing espresso & sketching wireframes',
+          tags: ['#Football', '#Startups', '#UIUX']
+        },
+        selectedPeerId: null,
+        pingStatusByPeer: {
+          tunde: 'matched'
+        },
+        activeChatPeerId: 'tunde',
+        drawerSubTab: 'chat', // 'chat' | 'capsule'
+        youSheetTab: 'vibes', // 'vibes' | 'vault'
+        hasUnseenVaultDrop: false,
+        chats: {
+          tunde: {
+            peerId: 'tunde',
+            sharedTag: '#Football',
+            expiresAt: Date.now() + 2 * 3600 * 1000,
+            handleSwapped: false,
+            capsuleUnlocked: false,
+            activityTitle: '',
+            capsuleExpiresAt: null,
+            moments: [],
+            messages: [
+              {
+                sender: 'peer',
+                text: 'Saw we both have #Football active — did you see that last-minute goal?!',
+                time: 'Just now'
+              }
+            ]
+          }
+        },
+        vaultCapsules: [
+          {
+            id: 'vault_past_1',
+            partnerName: 'Amina',
+            activityTitle: 'Airport Coffee',
+            dateLabel: 'Nov 19, 2026',
+            neighborhood: 'Mallam Aminu Kano Intl',
+            sharedTag: '#Startups',
+            moments: [
+              {
+                id: 'm_past_1a',
+                type: 'photo',
+                author: 'Amina',
+                timeLabel: '16:42',
+                sceneKey: 'airportCoffee',
+                caption: 'Two cortados before boarding call'
+              },
+              {
+                id: 'm_past_1b',
+                type: 'video',
+                duration: '18s',
+                author: 'You',
+                timeLabel: '16:55',
+                sceneKey: 'uiBrainstorm',
+                caption: 'Quick pitch deck walkthrough clip'
+              }
+            ]
+          },
+          {
+            id: 'vault_past_2',
+            partnerName: 'Khalid',
+            activityTitle: 'UI Brainstorm',
+            dateLabel: 'Nov 14, 2026',
+            neighborhood: 'Nassarawa GRA, Kano',
+            sharedTag: '#UIUX',
+            moments: [
+              {
+                id: 'm_past_2a',
+                type: 'video',
+                duration: '24s',
+                author: 'Khalid',
+                timeLabel: '19:10',
+                sceneKey: 'terraceSunset',
+                caption: 'Prototype demo on the terrace'
+              },
+              {
+                id: 'm_past_2b',
+                type: 'photo',
+                author: 'You',
+                timeLabel: '19:28',
+                sceneKey: 'uiBrainstorm',
+                caption: 'Final dark-mode token notes'
+              }
+            ]
+          }
+        ]
+      };
+    }
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return getDefaultState();
+        const parsed = JSON.parse(raw);
+        const def = getDefaultState();
+        return {
+          ...def,
+          ...parsed,
+          user: { ...def.user, ...(parsed.user || {}) },
+          pingStatusByPeer: { ...def.pingStatusByPeer, ...(parsed.pingStatusByPeer || {}) },
+          chats: parsed.chats && Object.keys(parsed.chats).length ? parsed.chats : def.chats,
+          vaultCapsules: Array.isArray(parsed.vaultCapsules) ? parsed.vaultCapsules : def.vaultCapsules
+        };
+      } catch (e) {
+        return getDefaultState();
+      }
+    }
+
+    let state = loadState();
+    let draftTags = [...state.user.tags];
+    let toastTimeout = null;
+    let lightboxAnimInterval = null;
+
+    function saveState() {
+      try {
+        // Persist serializable data (skip ephemeral object URLs if reloaded)
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      } catch (e) {
+        // Ignore storage quota issues in restricted iframes
+      }
+    }
+
+    function showToast(message) {
+      const toast = document.getElementById('toastBanner');
+      toast.textContent = message;
+      toast.classList.remove('opacity-0', '-translate-y-1');
+      toast.classList.add('opacity-100', 'translate-y-0');
+      clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => {
+        toast.classList.remove('opacity-100', 'translate-y-0');
+        toast.classList.add('opacity-0', '-translate-y-1');
+      }, 2300);
+    }
+
+    /* ==========================================================================
+       HELPERS: SHARED TAG MATCHING & INLINE SVG MOMENT CARD RENDERER
+       ========================================================================== */
+    function getSharedTags(peer) {
+      const userLower = state.user.tags.map(t => t.toLowerCase());
+      return peer.tags.filter(tag => userLower.includes(tag.toLowerCase()));
+    }
+
+    function formatClockTime() {
+      return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+
+    function renderMomentVisualHTML(moment, isLarge = false) {
+      if (moment.objectUrl) {
+        if (moment.type === 'video') {
+          return `
+            <video
+              src="${moment.objectUrl}"
+              class="w-full h-full object-cover"
+              ${isLarge ? 'controls autoplay loop playsinline' : 'muted playsinline'}
+            ></video>
+          `;
+        }
+        return `<img src="${moment.objectUrl}" alt="${moment.caption || 'Shared moment'}" class="w-full h-full object-cover" />`;
+      }
+
+      const scene = SCENE_TEMPLATES[moment.sceneKey] || SCENE_TEMPLATES.suyaMatch;
+      const gradId = `grad_${moment.id}_${isLarge ? 'lg' : 'sm'}`;
+      return `
+        <svg viewBox="0 0 240 300" class="w-full h-full object-cover block" preserveAspectRatio="xMidYMid slice">
+          <defs>
+            <linearGradient id="${gradId}" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="${scene.gradient[0]}" />
+              <stop offset="55%" stop-color="${scene.gradient[1]}" />
+              <stop offset="100%" stop-color="${scene.gradient[2]}" />
+            </linearGradient>
+          </defs>
+          <rect width="240" height="300" fill="url(#${gradId})" />
+          <circle cx="192" cy="58" r="46" fill="${scene.accent}" fill-opacity="0.10" />
+          <circle cx="48" cy="236" r="64" fill="#FFFFFF" fill-opacity="0.06" />
+          <text x="120" y="138" text-anchor="middle" font-size="44">${scene.icon}</text>
+          <text x="120" y="176" text-anchor="middle" fill="#FFFFFF" font-family="Plus Jakarta Sans, sans-serif" font-weight="700" font-size="14">
+            ${scene.title}
+          </text>
+          <text x="120" y="196" text-anchor="middle" fill="rgba(255,255,255,0.75)" font-family="Inter, sans-serif" font-size="10">
+            ${moment.caption || scene.caption}
+          </text>
+        </svg>
+      `;
+    }
+
+    /* ==========================================================================
+       THEME & HEADER RENDERING
+       ========================================================================== */
+    function applyTheme() {
+      const htmlEl = document.documentElement;
+      const sunIcon = document.getElementById('sunIcon');
+      const moonIcon = document.getElementById('moonIcon');
+
+      if (state.theme === 'dark') {
+        htmlEl.classList.add('dark');
+        sunIcon.classList.remove('hidden');
+        moonIcon.classList.add('hidden');
+      } else {
+        htmlEl.classList.remove('dark');
+        sunIcon.classList.add('hidden');
+        moonIcon.classList.remove('hidden');
+      }
+    }
+
+    function renderHeaderAndVibe() {
+      const liveDot = document.getElementById('liveIndicatorDot');
+      const liveLabel = document.getElementById('liveStatusLabel');
+      const ghostOverlay = document.getElementById('ghostOverlay');
+      const wave1 = document.getElementById('beaconWave1');
+      const wave2 = document.getElementById('beaconWave2');
+
+      if (state.isLive) {
+        liveDot.className = 'w-2 h-2 rounded-full bg-[#FF1E1E] inline-block animate-pulse';
+        liveLabel.textContent = 'LIVE';
+        liveLabel.style.color = 'var(--text-primary)';
+        ghostOverlay.classList.add('hidden');
+        wave1.classList.remove('hidden');
+        wave2.classList.remove('hidden');
+      } else {
+        liveDot.className = 'w-2 h-2 rounded-full border border-current inline-block';
+        liveDot.style.color = 'var(--text-secondary)';
+        liveLabel.textContent = 'GHOST';
+        liveLabel.style.color = 'var(--text-secondary)';
+        ghostOverlay.classList.remove('hidden');
+        wave1.classList.add('hidden');
+        wave2.classList.add('hidden');
+      }
+
+      document.getElementById('radiusLabel').textContent = `${state.radius}m`;
+      document.getElementById('outerRingLabel').textContent = `${state.radius}m`;
+      document.getElementById('midRingLabel').textContent = `${Math.round(state.radius / 2)}m`;
+
+      document.getElementById('headerUserAlias').textContent = state.user.alias || 'You';
+      document.getElementById('userStatusText').textContent = state.user.status;
+
+      // Red badge dot on [You] when new capsule moments are added
+      const badgeDot = document.getElementById('youVaultBadgeDot');
+      if (state.hasUnseenVaultDrop) {
+        badgeDot.classList.remove('hidden');
+      } else {
+        badgeDot.classList.add('hidden');
+      }
+
+      // Active 3 Tags Strip
+      const tagsRow = document.getElementById('activeTagsRow');
+      tagsRow.innerHTML = state.user.tags.map(tag => `
+        <span class="shrink-0 px-2.5 py-1 rounded-full text-[11px] font-semibold border"
+              style="background-color: var(--bg-pill); border-color: var(--border-subtle); color: var(--text-primary);">
+          ${tag}
+        </span>
+      `).join('');
+
+      // Filter Pill Active States
+      const sharedBtn = document.getElementById('filterSharedBtn');
+      const allBtn = document.getElementById('filterAllBtn');
+      if (state.filterMode === 'shared') {
+        sharedBtn.style.backgroundColor = 'var(--bg-canvas)';
+        sharedBtn.style.color = 'var(--text-primary)';
+        sharedBtn.style.boxShadow = '0 1px 3px rgba(0,0,0,0.08)';
+        allBtn.style.backgroundColor = 'transparent';
+        allBtn.style.color = 'var(--text-secondary)';
+        allBtn.style.boxShadow = 'none';
+      } else {
+        allBtn.style.backgroundColor = 'var(--bg-canvas)';
+        allBtn.style.color = 'var(--text-primary)';
+        allBtn.style.boxShadow = '0 1px 3px rgba(0,0,0,0.08)';
+        sharedBtn.style.backgroundColor = 'transparent';
+        sharedBtn.style.color = 'var(--text-secondary)';
+        sharedBtn.style.boxShadow = 'none';
+      }
+    }
+
+    /* ==========================================================================
+       PROXIMITY ORBIT RADAR & DOUBLE-OPT-IN PING (1.2s MUTUAL MATCH)
+       ========================================================================== */
+    function renderRadarNodes() {
+      const nodesLayer = document.getElementById('nodesLayer');
+      const inRangePeers = NEARBY_PEERS.filter(p => p.distance <= state.radius);
+      const matchedInRange = inRangePeers.filter(p => getSharedTags(p).length > 0);
+
+      const summaryEl = document.getElementById('radarSummaryText');
+      if (state.filterMode === 'shared') {
+        summaryEl.textContent = `${matchedInRange.length} vibe match${matchedInRange.length === 1 ? '' : 'es'} in ${state.radius}m`;
+      } else {
+        summaryEl.textContent = `${inRangePeers.length} nearby (${matchedInRange.length} shared vibe)`;
+      }
+
+      nodesLayer.innerHTML = NEARBY_PEERS.map(peer => {
+        const shared = getSharedTags(peer);
+        const isMatch = shared.length > 0;
+        const inRadius = peer.distance <= state.radius;
+        const visible = inRadius && (state.filterMode === 'all' || isMatch);
+        const isSelected = state.selectedPeerId === peer.id;
+
+        const ratio = Math.min(1, peer.distance / state.radius);
+        const radialPercent = 21 + ratio * 26.5;
+        const rad = (peer.angleDeg * Math.PI) / 180;
+        const leftPct = 50 + radialPercent * Math.cos(rad);
+        const topPct = 50 + radialPercent * Math.sin(rad);
+
+        if (!visible) {
+          return `<div class="radar-node-wrapper pointer-events-none opacity-0 scale-50" style="left: ${leftPct}%; top: ${topPct}%;"></div>`;
+        }
+
+        if (isMatch) {
+          return `
+            <button
+              type="button"
+              data-peer-id="${peer.id}"
+              class="radar-node-wrapper group flex flex-col items-center cursor-pointer focus:outline-none z-20"
+              style="left: ${leftPct}%; top: ${topPct}%;"
+              aria-label="${peer.name}, ${peer.distance} meters away"
+            >
+              <div class="relative flex items-center justify-center w-9 h-9">
+                <span class="node-halo absolute inset-0 rounded-full bg-[#FF1E1E]"></span>
+                ${isSelected ? `<span class="absolute -inset-1 rounded-full border-2 border-[#FF1E1E]"></span>` : ''}
+                <span class="relative w-4 h-4 rounded-full bg-[#FF1E1E] border-2 shadow-sm transition-transform group-hover:scale-110"
+                      style="border-color: var(--bg-canvas);"></span>
+              </div>
+              <span class="mt-0.5 px-1.5 py-0.5 rounded-full text-[10px] font-bold tabular-nums border"
+                    style="background-color: var(--bg-surface); border-color: var(--border-subtle); color: var(--text-primary);">
+                ~${peer.distance}m
+              </span>
+            </button>
+          `;
+        } else {
+          return `
+            <button
+              type="button"
+              data-peer-id="${peer.id}"
+              class="radar-node-wrapper group flex flex-col items-center cursor-pointer focus:outline-none z-10"
+              style="left: ${leftPct}%; top: ${topPct}%;"
+              aria-label="${peer.name}, ${peer.distance} meters away"
+            >
+              <div class="relative flex items-center justify-center w-8 h-8">
+                ${isSelected ? `<span class="absolute inset-0.5 rounded-full border" style="border-color: var(--text-primary);"></span>` : ''}
+                <span class="w-3 h-3 rounded-full transition-transform group-hover:scale-125"
+                      style="background-color: var(--node-neutral);"></span>
+              </div>
+              <span class="text-[9.5px] font-medium tabular-nums" style="color: var(--text-muted);">
+                ~${peer.distance}m
+              </span>
+            </button>
+          `;
+        }
+      }).join('');
+
+      nodesLayer.querySelectorAll('button[data-peer-id]').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          state.selectedPeerId = btn.getAttribute('data-peer-id');
+          saveState();
+          renderRadarNodes();
+          renderNodePreviewCard();
+        });
+      });
+    }
+
+    function renderNodePreviewCard() {
+      const card = document.getElementById('nodePreviewCard');
+      if (!state.selectedPeerId) {
+        card.classList.add('hidden');
+        return;
+      }
+
+      const peer = NEARBY_PEERS.find(p => p.id === state.selectedPeerId);
+      if (!peer || peer.distance > state.radius) {
+        state.selectedPeerId = null;
+        card.classList.add('hidden');
+        return;
+      }
+
+      card.classList.remove('hidden');
+      document.getElementById('previewName').textContent = peer.name;
+      document.getElementById('previewDistance').textContent = `~${peer.distance}m away`;
+      document.getElementById('previewStatus').textContent = peer.status;
+
+      const userLower = state.user.tags.map(t => t.toLowerCase());
+      document.getElementById('previewTags').innerHTML = peer.tags.map(tag => {
+        const isShared = userLower.includes(tag.toLowerCase());
+        return isShared
+          ? `<span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-[#FF1E1E] text-white">${tag}</span>`
+          : `<span class="px-2.5 py-1 rounded-full text-[11px] font-medium border" style="background-color: var(--bg-pill); border-color: var(--border-subtle); color: var(--text-secondary);">${tag}</span>`;
+      }).join('');
+
+      const pingBtn = document.getElementById('pingActionBtn');
+      const pingBtnText = document.getElementById('pingBtnText');
+      const pingState = state.pingStatusByPeer[peer.id] || 'idle';
+
+      if (pingState === 'pending') {
+        pingBtn.disabled = true;
+        pingBtn.style.backgroundColor = 'var(--text-primary)';
+        pingBtn.style.color = 'var(--bg-canvas)';
+        pingBtnText.innerHTML = `<span class="inline-block w-2 h-2 rounded-full bg-[#FF1E1E] animate-ping mr-1.5"></span> Pinged • Waiting...`;
+      } else if (pingState === 'matched') {
+        pingBtn.disabled = false;
+        pingBtn.style.backgroundColor = '#FF1E1E';
+        pingBtn.style.color = '#FFFFFF';
+        pingBtnText.textContent = `Open Live Hangout with ${peer.name}`;
+      } else {
+        pingBtn.disabled = false;
+        pingBtn.style.backgroundColor = '#FF1E1E';
+        pingBtn.style.color = '#FFFFFF';
+        pingBtnText.textContent = `Ping ${peer.name}`;
+      }
+    }
+
+    function triggerDoubleOptInPing(peerId) {
+      const peer = NEARBY_PEERS.find(p => p.id === peerId);
+      if (!peer) return;
+
+      const currentStatus = state.pingStatusByPeer[peerId] || 'idle';
+      if (currentStatus === 'matched') {
+        state.activeChatPeerId = peerId;
+        state.drawerSubTab = 'chat';
+        saveState();
+        openChatSheet();
+        return;
+      }
+      if (currentStatus === 'pending') return;
+
+      state.pingStatusByPeer[peerId] = 'pending';
+      saveState();
+      renderNodePreviewCard();
+
+      // Simulate mutual 'Ping Back' match within 1.2 seconds
+      setTimeout(() => {
+        state.pingStatusByPeer[peerId] = 'matched';
+        const shared = getSharedTags(peer);
+        const primaryTag = shared[0] || peer.tags[0];
+
+        if (!state.chats[peerId]) {
+          state.chats[peerId] = {
+            peerId: peer.id,
+            sharedTag: primaryTag,
+            expiresAt: Date.now() + 2 * 3600 * 1000,
+            handleSwapped: false,
+            capsuleUnlocked: false,
+            activityTitle: '',
+            capsuleExpiresAt: null,
+            moments: [],
+            messages: [
+              {
+                sender: 'peer',
+                text: `Hey! Mutual vibe on ${primaryTag} — noticed we're ~${peer.distance}m apart.`,
+                time: formatClockTime()
+              }
+            ]
+          };
+        }
+
+        state.activeChatPeerId = peerId;
+        state.selectedPeerId = null;
+        state.drawerSubTab = 'chat';
+        saveState();
+
+        renderRadarNodes();
+        renderNodePreviewCard();
+        renderBottomDrawerPill();
+        showToast(`Ping Back! Matched with ${peer.name}`);
+        openChatSheet();
+      }, 1200);
+    }
+
+    /* ==========================================================================
+       EPHEMERAL MICRO-CHAT + 'WE MET' SHARED MOMENT CAPSULE
+       ========================================================================== */
+    function formatRemainingFull(ms) {
+      const totalSec = Math.max(0, Math.floor(ms / 1000));
+      const h = Math.floor(totalSec / 3600);
+      const m = Math.floor((totalSec % 3600) / 60);
+      const s = totalSec % 60;
+      return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+    }
+
+    function updateCountdowns() {
+      const chatIds = Object.keys(state.chats);
+      if (!chatIds.length) return;
+
+      const activeChat = state.chats[state.activeChatPeerId] || state.chats[chatIds[0]];
+      const formatted = formatRemainingFull(activeChat.expiresAt - Date.now());
+
+      document.getElementById('pillCountdownText').textContent = formatted;
+      document.getElementById('chatTimerBanner').textContent = formatted;
+    }
+
+    function renderBottomDrawerPill() {
+      const chatIds = Object.keys(state.chats);
+      document.getElementById('activeChatCountBadge').textContent = chatIds.length;
+
+      const latestId = state.activeChatPeerId && state.chats[state.activeChatPeerId]
+        ? state.activeChatPeerId
+        : chatIds[chatIds.length - 1];
+
+      const latestChat = state.chats[latestId];
+      const peer = NEARBY_PEERS.find(p => p.id === latestId);
+      if (latestChat && peer) {
+        const lastMsg = latestChat.messages[latestChat.messages.length - 1];
+        const snippet = lastMsg ? lastMsg.text : 'Say hello!';
+        document.getElementById('drawerPreviewLine').textContent = `${peer.name} (${latestChat.sharedTag}) — ${snippet}`;
+        document.getElementById('drawerSubLine').textContent = latestChat.capsuleUnlocked
+          ? `Capsule unlocked: "${latestChat.activityTitle}" (${latestChat.moments.length} moments)`
+          : 'Tap to open micro-chat or unlock We Met Capsule';
+      }
+      updateCountdowns();
+    }
+
+    function syncCapsuleToVault(chat, peer) {
+      const vaultId = `vault_session_${chat.peerId}`;
+      const existingIdx = state.vaultCapsules.findIndex(v => v.id === vaultId);
+      const entry = {
+        id: vaultId,
+        partnerName: peer.name,
+        activityTitle: chat.activityTitle || 'In-Person Hangout',
+        dateLabel: 'Today • Live Session',
+        neighborhood: 'Kano • Nearby Orbit',
+        sharedTag: chat.sharedTag,
+        moments: [...chat.moments]
+      };
+      if (existingIdx >= 0) {
+        state.vaultCapsules[existingIdx] = entry;
+      } else {
+        state.vaultCapsules.unshift(entry);
+      }
+    }
+
+    function addMomentToActiveCapsule(momentObj) {
+      const activeChat = state.chats[state.activeChatPeerId];
+      const peer = NEARBY_PEERS.find(p => p.id === activeChat.peerId);
+      if (!activeChat || !peer) return;
+
+      activeChat.moments.unshift(momentObj);
+      syncCapsuleToVault(activeChat, peer);
+
+      // Show Signal Red badge dot on [You] avatar button
+      state.hasUnseenVaultDrop = true;
+      saveState();
+
+      renderHeaderAndVibe();
+      renderChatSheet();
+      renderBottomDrawerPill();
+    }
+
+    function renderChatSheet() {
+      const chatIds = Object.keys(state.chats);
+      if (!chatIds.length) return;
+
+      if (!state.chats[state.activeChatPeerId]) {
+        state.activeChatPeerId = chatIds[0];
+      }
+
+      const activeChat = state.chats[state.activeChatPeerId];
+      const peer = NEARBY_PEERS.find(p => p.id === activeChat.peerId);
+
+      // 1. Thread Switcher Pills
+      const switcherRow = document.getElementById('threadSwitcherRow');
+      switcherRow.innerHTML = chatIds.map(id => {
+        const p = NEARBY_PEERS.find(item => item.id === id);
+        const c = state.chats[id];
+        const isCurrent = id === state.activeChatPeerId;
+        return `
+          <button
+            type="button"
+            data-thread-id="${id}"
+            class="shrink-0 px-3 py-1.5 rounded-full text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer border"
+            style="${isCurrent
+              ? 'background-color: #FF1E1E; color: #FFFFFF; border-color: #FF1E1E;'
+              : 'background-color: var(--bg-pill); color: var(--text-primary); border-color: var(--border-subtle);'}"
+          >
+            <span>${p ? p.name : id}</span>
+            <span class="text-[10px] opacity-85">${c && c.capsuleUnlocked ? '✦ Capsule' : `~${p ? p.distance : 20}m`}</span>
+          </button>
+        `;
+      }).join('');
+
+      switcherRow.querySelectorAll('button[data-thread-id]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          state.activeChatPeerId = btn.getAttribute('data-thread-id');
+          document.getElementById('weMetSetupCard').classList.add('hidden');
+          saveState();
+          renderChatSheet();
+          renderBottomDrawerPill();
+        });
+      });
+
+      // 2. Peer Header & Swap Handles / We Met States
+      document.getElementById('activeChatPeerName').textContent = peer.name;
+      document.getElementById('activeChatPeerDist').textContent = `• ~${peer.distance}m`;
+      document.getElementById('activeChatSharedTag').textContent = activeChat.sharedTag;
+
+      const swapBtn = document.getElementById('swapHandlesBtn');
+      const handleBanner = document.getElementById('unlockedHandleBanner');
+      const handleStatusLine = document.getElementById('handleStatusLine');
+
+      if (activeChat.handleSwapped) {
+        swapBtn.textContent = 'Swapped ✓';
+        swapBtn.disabled = true;
+        swapBtn.style.opacity = '0.65';
+        handleStatusLine.textContent = `Connected (${peer.handle})`;
+        handleBanner.classList.remove('hidden');
+        document.getElementById('unlockedHandleText').textContent = `${peer.handle} ↔ ${state.user.handle}`;
+      } else {
+        swapBtn.textContent = 'Swap Handles';
+        swapBtn.disabled = false;
+        swapBtn.style.opacity = '1';
+        handleStatusLine.textContent = 'Temporary until handles swap or you meet';
+        handleBanner.classList.add('hidden');
+      }
+
+      // 'We Met' button state
+      const weMetBtn = document.getElementById('weMetBtn');
+      const weMetBtnLabel = document.getElementById('weMetBtnLabel');
+      const segmentWrapper = document.getElementById('drawerSegmentWrapper');
+
+      if (activeChat.capsuleUnlocked) {
+        weMetBtnLabel.textContent = 'We Met ✓';
+        weMetBtn.style.backgroundColor = 'var(--text-primary)';
+        weMetBtn.style.color = 'var(--bg-canvas)';
+        segmentWrapper.classList.remove('hidden');
+      } else {
+        weMetBtnLabel.textContent = 'We Met';
+        weMetBtn.style.backgroundColor = '#FF1E1E';
+        weMetBtn.style.color = '#FFFFFF';
+        segmentWrapper.classList.add('hidden');
+        state.drawerSubTab = 'chat';
+      }
+
+      // 3. Segmented Tab Toggle ('Chat' vs 'Capsule')
+      const tabChatBtn = document.getElementById('tabChatBtn');
+      const tabCapsuleBtn = document.getElementById('tabCapsuleBtn');
+      const chatTabPanel = document.getElementById('chatTabPanel');
+      const capsuleTabPanel = document.getElementById('capsuleTabPanel');
+
+      document.getElementById('capsuleCountPill').textContent = activeChat.moments.length;
+
+      if (state.drawerSubTab === 'capsule' && activeChat.capsuleUnlocked) {
+        tabCapsuleBtn.style.backgroundColor = 'var(--bg-canvas)';
+        tabCapsuleBtn.style.color = 'var(--text-primary)';
+        tabCapsuleBtn.style.boxShadow = '0 1px 3px rgba(0,0,0,0.08)';
+        tabChatBtn.style.backgroundColor = 'transparent';
+        tabChatBtn.style.color = 'var(--text-secondary)';
+        tabChatBtn.style.boxShadow = 'none';
+
+        chatTabPanel.classList.add('hidden');
+        capsuleTabPanel.classList.remove('hidden');
+      } else {
+        tabChatBtn.style.backgroundColor = 'var(--bg-canvas)';
+        tabChatBtn.style.color = 'var(--text-primary)';
+        tabChatBtn.style.boxShadow = '0 1px 3px rgba(0,0,0,0.08)';
+        tabCapsuleBtn.style.backgroundColor = 'transparent';
+        tabCapsuleBtn.style.color = 'var(--text-secondary)';
+        tabCapsuleBtn.style.boxShadow = 'none';
+
+        capsuleTabPanel.classList.add('hidden');
+        chatTabPanel.classList.remove('hidden');
+      }
+
+      // 4. Messages Feed
+      const messagesEl = document.getElementById('chatMessagesContainer');
+      messagesEl.innerHTML = activeChat.messages.map(msg => {
+        if (msg.sender === 'system') {
+          return `
+            <div class="flex justify-center my-1">
+              <span class="px-3 py-1 rounded-full text-[10.5px] font-semibold border"
+                    style="background-color: var(--brand-red-soft); border-color: rgba(255,30,30,0.2); color: #FF1E1E;">
+                ${msg.text}
+              </span>
+            </div>
+          `;
+        }
+        const isMe = msg.sender === 'me';
+        return `
+          <div class="flex flex-col ${isMe ? 'items-end' : 'items-start'}">
+            <div
+              class="max-w-[82%] px-3.5 py-2.5 rounded-2xl text-xs leading-relaxed ${isMe ? 'rounded-br-sm text-white bg-[#FF1E1E]' : 'rounded-bl-sm border'}"
+              style="${isMe ? '' : 'background-color: var(--bg-surface-solid); border-color: var(--border-subtle); color: var(--text-primary);'}"
+            >
+              ${msg.text}
+            </div>
+            <span class="text-[10px] mt-1 px-1" style="color: var(--text-muted);">${msg.time}</span>
+          </div>
+        `;
+      }).join('');
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+
+      // 5. Contextual Quick Icebreakers
+      const tag = activeChat.sharedTag;
+      const icebreakers = [
+        `What got you into ${tag}?`,
+        `By the corner table — wave if you see me!`,
+        `Down to grab a quick coffee nearby?`
+      ];
+      const chipsRow = document.getElementById('icebreakerChipsRow');
+      chipsRow.innerHTML = icebreakers.map(text => `
+        <button
+          type="button"
+          data-icebreaker="${text.replace(/"/g, '&quot;')}"
+          class="shrink-0 px-2.5 py-1 rounded-full text-[11px] font-medium border transition-colors cursor-pointer"
+          style="background-color: var(--bg-pill); border-color: var(--border-subtle); color: var(--text-secondary);"
+        >
+          ${text}
+        </button>
+      `).join('');
+
+      chipsRow.querySelectorAll('button[data-icebreaker]').forEach(chip => {
+        chip.addEventListener('click', () => {
+          sendChatMessage(chip.getAttribute('data-icebreaker'));
+        });
+      });
+
+      // 6. Render Capsule Tab Contents if unlocked
+      if (activeChat.capsuleUnlocked) {
+        document.getElementById('capsuleActivityHeading').textContent = activeChat.activityTitle;
+        document.getElementById('capsuleMetaLine').textContent = `Only visible to you & ${peer.name} • Zero likes or public feeds`;
+        document.getElementById('simPartnerDropLabel').textContent = `Simulate ${peer.name} Clip`;
+        document.getElementById('filmstripCountLabel').textContent = `${activeChat.moments.length} moment${activeChat.moments.length === 1 ? '' : 's'}`;
+
+        const filmstripEl = document.getElementById('capsuleFilmstripRow');
+        if (activeChat.moments.length === 0) {
+          filmstripEl.innerHTML = `
+            <div class="w-full rounded-2xl border border-dashed flex flex-col items-center justify-center p-6 text-center"
+                 style="border-color: var(--border-strong); background-color: var(--bg-pill);">
+              <span class="text-2xl mb-1.5">🎞️</span>
+              <p class="text-xs font-bold" style="color: var(--text-primary);">No moments dropped yet</p>
+              <p class="text-[11px] mt-0.5 max-w-[220px]" style="color: var(--text-secondary);">
+                Drop a photo or 15s–30s clip from "${activeChat.activityTitle}" to save it in both of your Vaults.
+              </p>
+            </div>
+          `;
+        } else {
+          filmstripEl.innerHTML = activeChat.moments.map((m, idx) => `
+            <button
+              type="button"
+              data-moment-idx="${idx}"
+              class="filmstrip-item relative shrink-0 w-[144px] h-[196px] rounded-2xl overflow-hidden border group cursor-pointer text-left"
+              style="border-color: var(--border-subtle);"
+            >
+              ${renderMomentVisualHTML(m, false)}
+              <!-- Top Badge (Video Duration or Photo) -->
+              <div class="absolute top-2 left-2 right-2 flex items-center justify-between">
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-black/70 text-white backdrop-blur-xs">
+                  ${m.type === 'video' ? `▶ ${m.duration || '20s'}` : '📷 Photo'}
+                </span>
+              </div>
+              <!-- Bottom Author & Time Caption -->
+              <div class="absolute inset-x-0 bottom-0 p-2 bg-gradient-to-t from-black/85 via-black/45 to-transparent text-white">
+                <p class="text-[10.5px] font-bold truncate">${m.author}</p>
+                <p class="text-[9.5px] text-white/75">${m.timeLabel}</p>
+              </div>
+            </button>
+          `).join('');
+
+          filmstripEl.querySelectorAll('button[data-moment-idx]').forEach(cardBtn => {
+            cardBtn.addEventListener('click', () => {
+              const mIdx = Number(cardBtn.getAttribute('data-moment-idx'));
+              const moment = activeChat.moments[mIdx];
+              if (moment) openMediaLightbox(moment);
+            });
+          });
+        }
+      }
+
+      updateCountdowns();
+    }
+
+    function sendChatMessage(rawText) {
+      const text = rawText.trim();
+      if (!text) return;
+
+      const activeChat = state.chats[state.activeChatPeerId];
+      const peer = NEARBY_PEERS.find(p => p.id === activeChat.peerId);
+      if (!activeChat || !peer) return;
+
+      activeChat.messages.push({
+        sender: 'me',
+        text,
+        time: formatClockTime()
+      });
+
+      saveState();
+      renderChatSheet();
+      renderBottomDrawerPill();
+
+      const targetChatId = activeChat.peerId;
+      setTimeout(() => {
+        const chatRef = state.chats[targetChatId];
+        if (!chatRef) return;
+        const replies = [
+          `Haha honestly so glad muzo pinged us — ${chatRef.sharedTag} folks are rare around here!`,
+          `I'm right over by the main window (~${peer.distance}m). Tap We Met when you walk over!`,
+          `100% down! Let's unlock a Capsule and drop a quick clip from the hangout.`
+        ];
+        chatRef.messages.push({
+          sender: 'peer',
+          text: replies[chatRef.messages.length % replies.length],
+          time: formatClockTime()
+        });
+        saveState();
+        if (state.activeChatPeerId === targetChatId) {
+          renderChatSheet();
+        }
+        renderBottomDrawerPill();
+      }, 1000);
+    }
+
+    function openChatSheet() {
+      renderChatSheet();
+      document.getElementById('chatBackdrop').classList.add('open');
+      document.getElementById('chatSheet').classList.add('open');
+    }
+
+    function closeChatSheet() {
+      document.getElementById('chatBackdrop').classList.remove('open');
+      document.getElementById('chatSheet').classList.remove('open');
+    }
+
+    /* ==========================================================================
+       '[YOU]' PROFILE, ACTIVE VIBES & PRIVATE CAPSULE VAULT SHEET
+       ========================================================================== */
+    function renderCuratedTagsGrid() {
+      const allAvailable = Array.from(new Set([...CURATED_TAGS, ...draftTags]));
+      const grid = document.getElementById('curatedTagsGrid');
+      document.getElementById('tagLimitCounter').textContent = `${draftTags.length} / 3 selected`;
+
+      grid.innerHTML = allAvailable.map(tag => {
+        const active = draftTags.some(t => t.toLowerCase() === tag.toLowerCase());
+        return `
+          <button
+            type="button"
+            data-tag="${tag}"
+            class="px-3 py-1.5 rounded-full text-xs font-semibold border transition-all cursor-pointer"
+            style="${active
+              ? 'background-color: #FF1E1E; color: #FFFFFF; border-color: #FF1E1E;'
+              : 'background-color: var(--bg-pill); color: var(--text-primary); border-color: var(--border-subtle);'}"
+          >
+            ${tag}
+          </button>
+        `;
+      }).join('');
+
+      grid.querySelectorAll('button[data-tag]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const tag = btn.getAttribute('data-tag');
+          const idx = draftTags.findIndex(t => t.toLowerCase() === tag.toLowerCase());
+          if (idx >= 0) {
+            if (draftTags.length === 1) {
+              showToast('Keep at least 1 active vibe tag');
+              return;
+            }
+            draftTags.splice(idx, 1);
+          } else {
+            if (draftTags.length >= 3) {
+              showToast('Max 3 active tags — tap one to swap');
+              return;
+            }
+            draftTags.push(tag);
+          }
+          renderCuratedTagsGrid();
+        });
+      });
+    }
+
+    function renderVaultList() {
+      document.getElementById('vaultTotalBadge').textContent = state.vaultCapsules.length;
+      const listEl = document.getElementById('vaultCapsulesList');
+
+      listEl.innerHTML = state.vaultCapsules.map((cap, idx) => {
+        const thumbMoment = cap.moments[0];
+        return `
+          <button
+            type="button"
+            data-vault-idx="${idx}"
+            class="w-full p-3 rounded-2xl border flex items-center gap-3 text-left transition-transform active:scale-[0.99] cursor-pointer"
+            style="background-color: var(--bg-surface-solid); border-color: var(--border-subtle);"
+          >
+            <!-- Square Filmstrip Thumbnail -->
+            <div class="w-16 h-16 rounded-xl overflow-hidden shrink-0 border flex items-center justify-center"
+                 style="border-color: var(--border-subtle); background-color: var(--bg-pill);">
+              ${thumbMoment
+                ? renderMomentVisualHTML(thumbMoment, false)
+                : `<span class="text-xl">🎞️</span>`
+              }
+            </div>
+
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center justify-between gap-2">
+                <h4 class="font-brand font-bold text-sm truncate" style="color: var(--text-primary);">
+                  ${cap.activityTitle}
+                </h4>
+                <span class="shrink-0 text-[10px] font-bold px-2 py-0.5 rounded-full" style="background-color: var(--brand-red-soft); color: #FF1E1E;">
+                  ${cap.sharedTag}
+                </span>
+              </div>
+              <p class="text-xs font-medium mt-0.5 truncate" style="color: var(--text-primary);">
+                With ${cap.partnerName} • ${cap.moments.length} moment${cap.moments.length === 1 ? '' : 's'}
+              </p>
+              <p class="text-[10.5px] mt-0.5 truncate" style="color: var(--text-secondary);">
+                ${cap.dateLabel} • ${cap.neighborhood}
+              </p>
+            </div>
+          </button>
+        `;
+      }).join('');
+
+      listEl.querySelectorAll('button[data-vault-idx]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const vIdx = Number(btn.getAttribute('data-vault-idx'));
+          const cap = state.vaultCapsules[vIdx];
+          if (cap) openVaultDetailModal(cap);
+        });
+      });
+    }
+
+    function syncYouSheetTabs() {
+      const vibesBtn = document.getElementById('youTabVibesBtn');
+      const vaultBtn = document.getElementById('youTabVaultBtn');
+      const vibesPanel = document.getElementById('youVibesPanel');
+      const vaultPanel = document.getElementById('youVaultPanel');
+
+      document.getElementById('vaultTotalBadge').textContent = state.vaultCapsules.length;
+
+      if (state.youSheetTab === 'vault') {
+        vaultBtn.style.backgroundColor = 'var(--bg-canvas)';
+        vaultBtn.style.color = 'var(--text-primary)';
+        vaultBtn.style.boxShadow = '0 1px 3px rgba(0,0,0,0.08)';
+        vibesBtn.style.backgroundColor = 'transparent';
+        vibesBtn.style.color = 'var(--text-secondary)';
+        vibesBtn.style.boxShadow = 'none';
+
+        vibesPanel.classList.add('hidden');
+        vaultPanel.classList.remove('hidden');
+        renderVaultList();
+      } else {
+        vibesBtn.style.backgroundColor = 'var(--bg-canvas)';
+        vibesBtn.style.color = 'var(--text-primary)';
+        vibesBtn.style.boxShadow = '0 1px 3px rgba(0,0,0,0.08)';
+        vaultBtn.style.backgroundColor = 'transparent';
+        vaultBtn.style.color = 'var(--text-secondary)';
+        vaultBtn.style.boxShadow = 'none';
+
+        vaultPanel.classList.add('hidden');
+        vibesPanel.classList.remove('hidden');
+      }
+    }
+
+    function openVibeSheet(initialTab = 'vibes') {
+      state.youSheetTab = initialTab;
+      if (initialTab === 'vault' || state.hasUnseenVaultDrop) {
+        state.hasUnseenVaultDrop = false;
+        saveState();
+        renderHeaderAndVibe();
+      }
+
+      draftTags = [...state.user.tags];
+      document.getElementById('aliasInput').value = state.user.alias;
+      document.getElementById('handleInput').value = state.user.handle;
+      document.getElementById('statusInput').value = state.user.status;
+      document.getElementById('customTagInput').value = '';
+      renderCuratedTagsGrid();
+      syncYouSheetTabs();
+
+      document.getElementById('vibeBackdrop').classList.add('open');
+      document.getElementById('vibeSheet').classList.add('open');
+    }
+
+    function closeVibeSheet() {
+      document.getElementById('vibeBackdrop').classList.remove('open');
+      document.getElementById('vibeSheet').classList.remove('open');
+    }
+
+    /* ==========================================================================
+       VAULT CAPSULE DETAIL MODAL & MEDIA LIGHTBOX PLAYER
+       ========================================================================== */
+    function openVaultDetailModal(capsule) {
+      document.getElementById('vaultDetailTitle').textContent = capsule.activityTitle;
+      document.getElementById('vaultDetailTag').textContent = capsule.sharedTag;
+      document.getElementById('vaultDetailMeta').textContent = `With ${capsule.partnerName} • ${capsule.dateLabel} • ${capsule.neighborhood}`;
+      document.getElementById('vaultDetailPartner').textContent = capsule.partnerName;
+
+      const stripEl = document.getElementById('vaultDetailStrip');
+      if (!capsule.moments.length) {
+        stripEl.innerHTML = `<p class="text-xs py-6 text-center w-full" style="color: var(--text-secondary);">No photos or clips added to this capsule yet.</p>`;
+      } else {
+        stripEl.innerHTML = capsule.moments.map((m, i) => `
+          <button
+            type="button"
+            data-detail-m-idx="${i}"
+            class="filmstrip-item relative shrink-0 w-[152px] h-[206px] rounded-2xl overflow-hidden border cursor-pointer text-left"
+            style="border-color: var(--border-subtle);"
+          >
+            ${renderMomentVisualHTML(m, false)}
+            <span class="absolute top-2 left-2 px-2 py-0.5 rounded-full text-[10px] font-bold bg-black/70 text-white">
+              ${m.type === 'video' ? `▶ ${m.duration || '20s'}` : '📷 Photo'}
+            </span>
+            <div class="absolute inset-x-0 bottom-0 p-2 bg-gradient-to-t from-black/85 to-transparent text-white">
+              <p class="text-[10.5px] font-bold truncate">${m.author}</p>
+              <p class="text-[9.5px] text-white/75">${m.timeLabel}</p>
+            </div>
+          </button>
+        `).join('');
+
+        stripEl.querySelectorAll('button[data-detail-m-idx]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const idx = Number(btn.getAttribute('data-detail-m-idx'));
+            if (capsule.moments[idx]) openMediaLightbox(capsule.moments[idx]);
+          });
+        });
+      }
+
+      document.getElementById('vaultDetailModal').classList.add('open');
+    }
+
+    function closeVaultDetailModal() {
+      document.getElementById('vaultDetailModal').classList.remove('open');
+    }
+
+    function openMediaLightbox(moment) {
+      clearInterval(lightboxAnimInterval);
+      document.getElementById('lightboxTitle').textContent = moment.type === 'video'
+        ? `Video Clip • ${moment.duration || '18s'}`
+        : 'Shared Moment Photo';
+      document.getElementById('lightboxSub').textContent = `Dropped by ${moment.author} • ${moment.timeLabel}`;
+
+      const stage = document.getElementById('lightboxStage');
+      if (moment.objectUrl) {
+        stage.innerHTML = `<div class="w-full max-h-[62dvh] flex items-center justify-center bg-black">${renderMomentVisualHTML(moment, true)}</div>`;
+      } else if (moment.type === 'video') {
+        // Simulated 18s-24s clip player with animated progress bar
+        stage.innerHTML = `
+          <div class="relative w-full aspect-[4/5] max-h-[58dvh] rounded-3xl overflow-hidden border border-white/15">
+            ${renderMomentVisualHTML(moment, true)}
+            <div class="absolute inset-x-4 bottom-4 bg-black/75 backdrop-blur-md rounded-2xl p-3 border border-white/15">
+              <div class="flex items-center justify-between text-[11px] font-bold mb-1.5">
+                <span class="flex items-center gap-1.5 text-[#FF1E1E]">
+                  <span class="w-2 h-2 rounded-full bg-[#FF1E1E] animate-ping"></span> Playing Clip
+                </span>
+                <span id="simClipTimer" class="tabular-nums text-white/80">00:01 / 00:${(moment.duration || '18s').replace('s', '')}</span>
+              </div>
+              <div class="w-full h-1.5 rounded-full bg-white/20 overflow-hidden">
+                <div id="simClipBar" class="h-full bg-[#FF1E1E] transition-all duration-300" style="width: 12%;"></div>
+              </div>
+            </div>
+          </div>
+        `;
+        let sec = 1;
+        const maxSec = parseInt(moment.duration || '18', 10) || 18;
+        lightboxAnimInterval = setInterval(() => {
+          sec = sec >= maxSec ? 1 : sec + 1;
+          const bar = document.getElementById('simClipBar');
+          const timer = document.getElementById('simClipTimer');
+          if (bar) bar.style.width = `${Math.round((sec / maxSec) * 100)}%`;
+          if (timer) timer.textContent = `00:${String(sec).padStart(2, '0')} / 00:${String(maxSec).padStart(2, '0')}`;
+        }, 700);
+      } else {
+        stage.innerHTML = `
+          <div class="relative w-full aspect-[4/5] max-h-[58dvh] rounded-3xl overflow-hidden border border-white/15">
+            ${renderMomentVisualHTML(moment, true)}
+          </div>
+        `;
+      }
+
+      document.getElementById('mediaLightboxModal').classList.add('open');
+    }
+
+    function closeMediaLightbox() {
+      clearInterval(lightboxAnimInterval);
+      document.getElementById('mediaLightboxModal').classList.remove('open');
+    }
+
+    /* ==========================================================================
+       EVENT BINDINGS & INITIALIZATION
+       ========================================================================== */
+    function initEvents() {
+      // Theme Toggle (Daylight <-> OLED Dark)
+      document.getElementById('themeToggleBtn').addEventListener('click', () => {
+        state.theme = state.theme === 'light' ? 'dark' : 'light';
+        saveState();
+        applyTheme();
+        renderHeaderAndVibe();
+      });
+
+      // Live / Ghost Mode Toggle
+      document.getElementById('liveToggleBtn').addEventListener('click', () => {
+        state.isLive = !state.isLive;
+        if (!state.isLive) state.selectedPeerId = null;
+        saveState();
+        renderHeaderAndVibe();
+        renderNodePreviewCard();
+      });
+
+      document.getElementById('resumeLiveBtn').addEventListener('click', () => {
+        state.isLive = true;
+        saveState();
+        renderHeaderAndVibe();
+      });
+
+      // Radius Cycle (20m -> 100m -> 500m)
+      document.getElementById('radiusCycleBtn').addEventListener('click', () => {
+        const idx = RADIUS_STEPS.indexOf(state.radius);
+        state.radius = RADIUS_STEPS[(idx + 1) % RADIUS_STEPS.length];
+        saveState();
+        renderHeaderAndVibe();
+        renderRadarNodes();
+        renderNodePreviewCard();
+      });
+
+      // Shared Vibe vs All Nearby Filter
+      document.getElementById('filterSharedBtn').addEventListener('click', () => {
+        state.filterMode = 'shared';
+        saveState();
+        renderHeaderAndVibe();
+        renderRadarNodes();
+      });
+
+      document.getElementById('filterAllBtn').addEventListener('click', () => {
+        state.filterMode = 'all';
+        saveState();
+        renderHeaderAndVibe();
+        renderRadarNodes();
+      });
+
+      // Dismiss Node Preview Card
+      document.getElementById('closePreviewBtn').addEventListener('click', () => {
+        state.selectedPeerId = null;
+        saveState();
+        renderRadarNodes();
+        renderNodePreviewCard();
+      });
+
+      document.getElementById('radarSection').addEventListener('click', () => {
+        if (state.selectedPeerId) {
+          state.selectedPeerId = null;
+          saveState();
+          renderRadarNodes();
+          renderNodePreviewCard();
+        }
+      });
+
+      document.getElementById('nodePreviewCard').addEventListener('click', (e) => {
+        e.stopPropagation();
+      });
+
+      // Double-Opt-In Ping Button
+      document.getElementById('pingActionBtn').addEventListener('click', () => {
+        if (state.selectedPeerId) {
+          triggerDoubleOptInPing(state.selectedPeerId);
+        }
+      });
+
+      // Ephemeral Chat Drawer Open / Close
+      document.getElementById('openChatDrawerBtn').addEventListener('click', openChatSheet);
+      document.getElementById('closeChatSheetBtn').addEventListener('click', closeChatSheet);
+      document.getElementById('chatBackdrop').addEventListener('click', closeChatSheet);
+
+      // Chat Form Submit
+      document.getElementById('chatMessageForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const input = document.getElementById('chatMessageInput');
+        sendChatMessage(input.value);
+        input.value = '';
+      });
+
+      // Mutual Swap Handles Flow
+      document.getElementById('swapHandlesBtn').addEventListener('click', () => {
+        const activeChat = state.chats[state.activeChatPeerId];
+        const peer = NEARBY_PEERS.find(p => p.id === activeChat.peerId);
+        if (!activeChat || activeChat.handleSwapped) return;
+
+        const btn = document.getElementById('swapHandlesBtn');
+        btn.disabled = true;
+        btn.textContent = 'Swapping...';
+
+        setTimeout(() => {
+          activeChat.handleSwapped = true;
+          activeChat.messages.push({
+            sender: 'peer',
+            text: `Swapped! Here's my handle so we keep in touch: ${peer.handle}`,
+            time: formatClockTime()
+          });
+          saveState();
+          renderChatSheet();
+          renderBottomDrawerPill();
+          showToast(`Unlocked ${peer.handle}`);
+        }, 900);
+      });
+
+      // Copy Unlocked Handle
+      document.getElementById('copyHandleBtn').addEventListener('click', () => {
+        const activeChat = state.chats[state.activeChatPeerId];
+        const peer = NEARBY_PEERS.find(p => p.id === activeChat.peerId);
+        if (!peer) return;
+
+        const tempInput = document.createElement('input');
+        tempInput.value = peer.handle;
+        document.body.appendChild(tempInput);
+        tempInput.select();
+        try {
+          document.execCommand('copy');
+          showToast(`Copied ${peer.handle}`);
+        } catch (err) {
+          showToast(peer.handle);
+        }
+        document.body.removeChild(tempInput);
+      });
+
+      // 'We Met' Shared Moment Capsule Unlock Flow
+      document.getElementById('weMetBtn').addEventListener('click', () => {
+        const activeChat = state.chats[state.activeChatPeerId];
+        if (!activeChat) return;
+
+        if (activeChat.capsuleUnlocked) {
+          state.drawerSubTab = 'capsule';
+          saveState();
+          renderChatSheet();
+          return;
+        }
+
+        const setupCard = document.getElementById('weMetSetupCard');
+        setupCard.classList.remove('hidden');
+        document.getElementById('activityTitleInput').value = 'Suya & Match';
+      });
+
+      document.getElementById('cancelWeMetBtn').addEventListener('click', () => {
+        document.getElementById('weMetSetupCard').classList.add('hidden');
+      });
+
+      document.querySelectorAll('.activity-preset-pill').forEach(pill => {
+        pill.addEventListener('click', () => {
+          document.getElementById('activityTitleInput').value = pill.getAttribute('data-activity');
+        });
+      });
+
+      document.getElementById('confirmWeMetBtn').addEventListener('click', () => {
+        const activeChat = state.chats[state.activeChatPeerId];
+        const peer = NEARBY_PEERS.find(p => p.id === activeChat.peerId);
+        if (!activeChat || !peer) return;
+
+        const rawTitle = document.getElementById('activityTitleInput').value.trim();
+        const title = rawTitle || 'Suya & Match';
+
+        activeChat.capsuleUnlocked = true;
+        activeChat.activityTitle = title;
+        activeChat.capsuleExpiresAt = Date.now() + 24 * 3600 * 1000;
+        activeChat.messages.push({
+          sender: 'system',
+          text: `✦ You & ${peer.name} unlocked "${title}" Shared Moment Capsule`,
+          time: formatClockTime()
+        });
+
+        syncCapsuleToVault(activeChat, peer);
+        state.drawerSubTab = 'capsule';
+        state.hasUnseenVaultDrop = true;
+        saveState();
+
+        document.getElementById('weMetSetupCard').classList.add('hidden');
+        renderHeaderAndVibe();
+        renderChatSheet();
+        renderBottomDrawerPill();
+        showToast(`Unlocked "${title}" Capsule!`);
+      });
+
+      // Drawer Segmented Toggle: 'Chat' vs 'Capsule'
+      document.getElementById('tabChatBtn').addEventListener('click', () => {
+        state.drawerSubTab = 'chat';
+        saveState();
+        renderChatSheet();
+      });
+
+      document.getElementById('tabCapsuleBtn').addEventListener('click', () => {
+        state.drawerSubTab = 'capsule';
+        saveState();
+        renderChatSheet();
+      });
+
+      // '+ Drop Moment' Real File Upload (<input type="file" accept="image/*,video/*">)
+      document.getElementById('dropMomentPrimaryBtn').addEventListener('click', () => {
+        document.getElementById('momentFileInput').click();
+      });
+
+      document.getElementById('momentFileInput').addEventListener('change', (e) => {
+        const files = Array.from(e.target.files || []);
+        if (!files.length) return;
+
+        files.forEach((file, index) => {
+          const isVideo = file.type.startsWith('video/');
+          const objectUrl = URL.createObjectURL(file);
+          addMomentToActiveCapsule({
+            id: `m_file_${Date.now()}_${index}`,
+            type: isVideo ? 'video' : 'photo',
+            duration: isVideo ? '22s' : null,
+            author: state.user.alias || 'You',
+            timeLabel: formatClockTime(),
+            objectUrl,
+            caption: file.name.slice(0, 26)
+          });
+        });
+
+        e.target.value = '';
+        showToast(`Dropped ${files.length} moment${files.length > 1 ? 's' : ''} into Capsule!`);
+      });
+
+      // Simulated Instant Camera Snap
+      document.getElementById('simCameraSnapBtn').addEventListener('click', () => {
+        const sceneKeys = Object.keys(SCENE_TEMPLATES);
+        const pick = sceneKeys[Math.floor(Math.random() * sceneKeys.length)];
+        addMomentToActiveCapsule({
+          id: `m_cam_${Date.now()}`,
+          type: 'photo',
+          author: state.user.alias || 'You',
+          timeLabel: formatClockTime(),
+          sceneKey: pick,
+          caption: SCENE_TEMPLATES[pick].caption
+        });
+        showToast('Instant camera photo saved to Capsule');
+      });
+
+      // Simulated Partner 15s-30s Video Clip Drop
+      document.getElementById('simPartnerDropBtn').addEventListener('click', () => {
+        const activeChat = state.chats[state.activeChatPeerId];
+        const peer = NEARBY_PEERS.find(p => p.id === activeChat.peerId);
+        const durations = ['15s', '19s', '27s'];
+        const dur = durations[Math.floor(Math.random() * durations.length)];
+        const sceneKeys = Object.keys(SCENE_TEMPLATES);
+        const pick = sceneKeys[Math.floor(Math.random() * sceneKeys.length)];
+
+        addMomentToActiveCapsule({
+          id: `m_peer_${Date.now()}`,
+          type: 'video',
+          duration: dur,
+          author: peer ? peer.name : 'Partner',
+          timeLabel: formatClockTime(),
+          sceneKey: pick,
+          caption: SCENE_TEMPLATES[pick].caption
+        });
+        showToast(`${peer ? peer.name : 'Partner'} dropped a ${dur} clip!`);
+      });
+
+      // '[You]' Sheet Open / Close & Sub-Tabs ('Active Vibes' vs 'Your Vault')
+      document.getElementById('editVibeBtn').addEventListener('click', () => openVibeSheet('vibes'));
+      document.getElementById('centerSelfBtn').addEventListener('click', (e) => {
+        e.stopPropagation();
+        openVibeSheet('vibes');
+      });
+      document.getElementById('profileTriggerBtn').addEventListener('click', () => {
+        // Open directly to Vault if a new drop arrived, otherwise Active Vibes
+        openVibeSheet(state.hasUnseenVaultDrop ? 'vault' : 'vibes');
+      });
+
+      document.getElementById('youTabVibesBtn').addEventListener('click', () => {
+        state.youSheetTab = 'vibes';
+        syncYouSheetTabs();
+      });
+
+      document.getElementById('youTabVaultBtn').addEventListener('click', () => {
+        state.youSheetTab = 'vault';
+        syncYouSheetTabs();
+      });
+
+      document.getElementById('closeVibeSheetBtn').addEventListener('click', closeVibeSheet);
+      document.getElementById('vibeBackdrop').addEventListener('click', closeVibeSheet);
+
+      // Vault Detail & Lightbox Modals
+      document.getElementById('closeVaultDetailBtn').addEventListener('click', closeVaultDetailModal);
+      document.getElementById('vaultDetailModal').addEventListener('click', (e) => {
+        if (e.target.id === 'vaultDetailModal') closeVaultDetailModal();
+      });
+
+      document.getElementById('closeLightboxBtn').addEventListener('click', closeMediaLightbox);
+      document.getElementById('mediaLightboxModal').addEventListener('click', (e) => {
+        if (e.target.id === 'mediaLightboxModal') closeMediaLightbox();
+      });
+
+      // Add Custom #Tag
+      document.getElementById('addCustomTagBtn').addEventListener('click', () => {
+        const input = document.getElementById('customTagInput');
+        let raw = input.value.trim().replace(/\s+/g, '');
+        if (!raw) return;
+        if (!raw.startsWith('#')) raw = `#${raw}`;
+        if (draftTags.some(t => t.toLowerCase() === raw.toLowerCase())) {
+          showToast('Tag already selected');
+          input.value = '';
+          return;
+        }
+        if (draftTags.length >= 3) {
+          showToast('Max 3 active tags — deselect one first');
+          return;
+        }
+        draftTags.push(raw);
+        input.value = '';
+        renderCuratedTagsGrid();
+      });
+
+      // Save Vibe & Recalculate Radar
+      document.getElementById('saveVibeBtn').addEventListener('click', () => {
+        const aliasVal = document.getElementById('aliasInput').value.trim() || 'You';
+        let handleVal = document.getElementById('handleInput').value.trim() || '@you.muzo';
+        if (!handleVal.startsWith('@')) handleVal = `@${handleVal}`;
+        const statusVal = document.getElementById('statusInput').value.trim() || 'Open to nearby conversation';
+
+        state.user.alias = aliasVal;
+        state.user.handle = handleVal;
+        state.user.status = statusVal;
+        state.user.tags = [...draftTags];
+
+        saveState();
+        renderHeaderAndVibe();
+        renderRadarNodes();
+        renderNodePreviewCard();
+        closeVibeSheet();
+        showToast('Radar updated with your vibe');
+      });
+
+      // Reset Demo State
+      document.getElementById('resetDemoBtn').addEventListener('click', () => {
+        localStorage.removeItem(STORAGE_KEY);
+        state = getDefaultState();
+        draftTags = [...state.user.tags];
+        applyTheme();
+        renderHeaderAndVibe();
+        renderRadarNodes();
+        renderNodePreviewCard();
+        renderBottomDrawerPill();
+        closeVibeSheet();
+        showToast('Demo state & Vault restored');
+      });
+    }
+
+    // Boot Application
+    window.addEventListener('DOMContentLoaded', () => {
+      applyTheme();
+      renderHeaderAndVibe();
+      renderRadarNodes();
+      renderNodePreviewCard();
+      renderBottomDrawerPill();
+      initEvents();
+      setInterval(updateCountdowns, 1000);
+    });
+  </script>
+</body>
+</html>
